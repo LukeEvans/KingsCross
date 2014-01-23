@@ -4,17 +4,17 @@ import akka.sbt.AkkaKernelPlugin
 import akka.sbt.AkkaKernelPlugin.{ Dist, outputDirectory, distJvmOptions}
  
 object ReductoBuild extends Build {
-  val Organization = "reactor.accio"
+  val Organization = "reactor.kingscross"
   val Version      = "0.1.0"
   val ScalaVersion = "2.10.3"
  
-  lazy val ReductoDist = Project(
-    id = "reducto-API",
+  lazy val KingsCrossDist = Project(
+    id = "KingsCross-API",
     base = file("."),
     settings = defaultSettings ++ AkkaKernelPlugin.distSettings ++ Seq(
-      libraryDependencies ++= Dependencies.reductoKernel,
+      libraryDependencies ++= Dependencies.kingscrossKernel,
       distJvmOptions in Dist := "-Xms256M -Xmx1024M",
-      outputDirectory in Dist := file("target/accio-dist")
+      outputDirectory in Dist := file("target/kingscross-dist")
       
     )
   )
@@ -37,7 +37,7 @@ object ReductoBuild extends Build {
 object Dependencies {
   import Dependency._
  
-  val reductoKernel = Seq(
+  val kingscrossKernel = Seq(
     akkaKernel, akkaSlf4j, logback
   )
 }

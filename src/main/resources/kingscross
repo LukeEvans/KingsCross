@@ -6,9 +6,6 @@ akka.cluster.min-nr-of-members = 1
 
 # //#role-min-nr-of-members
 akka.cluster.role {
-  accio-frontend.min-nr-of-members = 1
-  #reducto-worker.min-nr-of-members = 1
-  #reducto-supervisor.min-nr-of-members = 1
+  kc-frontend.min-nr-of-members = 1
 }
 # //#role-min-nr-of-members
-

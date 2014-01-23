@@ -1,4 +1,4 @@
-Akka implementation of Contextual API
+Akka implementation of Cron
 ========
 
 
