@@ -1,0 +1,90 @@
+---
+
+- name: Send distribution
+  hosts:
+  - tag_Name_reducto-frontend-01
+  - tag_Name_reducto-worker-01
+  - tag_Name_reducto-supervisor-01
+  - tag_Name_reducto-parser-01
+  user: ubuntu
+  sudo: true
+  gather_facts: false
+  tasks:
+
+      - name: Remove old Dist
+        command: rm -rf /usr/local/reducto-dist
+        ignore_errors: yes
+
+      - name: Copy project Dist
+        copy: src=../target/reducto-dist dest=/usr/local/
+
+
+- name: Re-deploy Frontend
+  hosts:
+  - tag_Name_reducto-frontend-01
+  
+  user: ubuntu
+  sudo: true
+  gather_facts: false
+
+  tasks:
+      - name: Kill previous frontend run
+        command: stop reducto-frontend N=1
+        ignore_errors: yes
+
+
+- name: Re-deploy Worker
+  hosts:
+  - tag_Name_reducto-worker-01
+  
+  user: ubuntu
+  sudo: true
+  gather_facts: false
+  tasks:
+      - name: Kill previous worker runs
+        command: stop reducto-worker N={{ item }}
+        with_items:
+           - 1
+           - 2
+        ignore_errors: yes
+
+      - name: Kill previous parser runs
+        command: stop reducto-parser N={{ item }}
+        with_items:
+           - 1
+           - 2
+           - 3
+           - 4
+        ignore_errors: yes
+
+
+- name: Re-deploy Parser
+  hosts:
+  - tag_Name_reducto-parser-01
+  
+  user: ubuntu
+  sudo: true
+  gather_facts: false
+  tasks:
+      - name: Kill previous parser runs
+        command: stop reducto-parser N={{ item }}
+        with_items:
+           - 1
+           - 2
+           - 3
+           - 4
+        ignore_errors: yes
+
+
+- name: Re-deploy Supervisor
+  hosts:
+  - tag_Name_reducto-supervisor-01
+  
+  user: ubuntu
+  sudo: true
+  gather_facts: false
+  tasks:
+      - name: Kill previous supervisor runs
+        command: stop reducto-supervisor N=1
+        ignore_errors: yes
+

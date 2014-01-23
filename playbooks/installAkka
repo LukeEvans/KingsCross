@@ -1,0 +1,14 @@
+      - name: Download Akka
+        get_url: url=http://downloads.typesafe.com/akka/akka-2.2.3.zip dest=/usr/local/akka.zip mode=0440
+
+      - name: Unzip Akka
+        shell: cd /usr/local && unzip akka.zip
+    
+      - name: Rename Akka directory
+        shell: mv /usr/local/akka-2.2.3 /usr/local/akka
+
+      - name: Ensure proper permissions for Akka
+        action: file path=/usr/local/akka/bin/akka mode=777
+     
+      - name: Cleanup Akka Install
+        shell: cd /usr/lib && mv akka-2.2.3 akka && rm akka.zip

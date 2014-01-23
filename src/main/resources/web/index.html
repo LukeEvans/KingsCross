@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+	</head>
+	<body>
+
+		<h1 align="center"> Reactor Summarization Tool </h1>
+
+		<div id="body">
+			<!--
+			<div id="tool_div">
+				<p><a href=" https://chrome.google.com/webstore/detail/jsonview/chklaanhfefbnpoihckbnefhakgolnmc?hl=en">JsonView Chrome Plugin</a></p>
+			</div>
+			-->
+						<p class="title"><b> News Summarization API </b> </p>
+			
+			<div class= "instructions">
+				<p>
+					API URL: http://reactor-reducto.elasticbeanstalk.com/url <br>
+					Field(s): "url"
+				</p>
+				<p>
+					1. Make sure you have a JSON parser installed, or install the <a href=" https://chrome.google.com/webstore/detail/jsonview/chklaanhfefbnpoihckbnefhakgolnmc?hl=en">JsonView Chrome Plugin</a>.<br>
+					2. Copy/Paste a news article URL.<br>
+					3. Click "Submit" to perform News Summarization with Contextual Results.<br>
+				</p>
+			</div>	
+			
+			<!-- <form action="http://ec2-107-22-14-112.compute-1.amazonaws.com:8080/url" method="post"> -->
+			<form action="http://localhost:8080/url" method="post">
+				<div>URL: </div>
+				<div>
+					<input class = "input_box" name="url"/>
+				</div>
+				<br>
+				<div class = "checkbox_div">
+					<input  type="checkbox" name="decay" value = "false"> Exclude Decay </input>
+					&nbsp;
+					&nbsp;
+					<input  type="checkbox" name="separationRules" value = "false"> Exclude Separation Rules </input>
+					<br>
+					<input class="input_box_small" type="number" name="sentences" min="1" value = "3"> # of Sentences </input>
+					&nbsp;
+					&nbsp;
+					<input class="input_box_small" type="text" name ="ratio" value= "0.0"> Ratio (e.g. 0.2)</input>
+				</div>
+				<div class="submit_button"><button type="submit" >Submit</button></div>
+			</form>
+			<br>
+			<br>
+			<!-- <form action="http://ec2-107-22-14-112.compute-1.amazonaws.com:8080/text" method="post"> -->
+			<form action="http://localhost:8080/text" method="post">
+				<div>Headline: </div>
+				<div>
+					<input class = "input_box" name="headline"/>
+				</div>
+				<br>
+				<div>Text: </div>
+				<div>
+					<textarea class="input_area2" id = "text2" name="text" value=""></textarea>		
+				</div>
+				<br>
+				<div class = "checkbox_div">
+					<input  type="checkbox" name="decay" value = "false"> Exclude Decay </input>
+					&nbsp;
+					&nbsp;
+					<input  type="checkbox" name="separationRules" value = "false"> Exclude Separation Rules </input>
+					<br>
+					<input class="input_box_small" type="number" name="sentences" min="1" value = "3"> # of Sentences </input>
+					&nbsp;
+					&nbsp;
+					<input class="input_box_small" type="text" value="0.0" name ="ratio"> Ratio (e.g. 0.2)</input>
+				</div>
+				<div class="submit_button"><button type="submit" >Submit</button></div>
+			</form>
+			
+			<br>
+			<br>
+			<hr />
+<!-- 			<br>
+
+			<br>
+			<br> -->
+
+			<p>CONFIDENTIAL. ALL TOOLS, CONTENTS AND RESULTS ARE PROPERTY OF REACTOR INC. PATENT-PENDING. 2013.</p>
+		</div>
+	</body>
+</html>

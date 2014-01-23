@@ -1,0 +1,27 @@
+- name: Install Packages
+  hosts:
+  - tag_Name_reducto-01
+  user: ubuntu
+  sudo: true
+  gather_facts: true
+  tasks:
+      - name: Update apt cache
+        action: apt update_cache=yes 
+
+      - name: Install Git
+        action: apt pkg='git' state=present
+
+      - name: Install wget package
+        action: apt pkg='wget' state=installed
+
+      - name: Copy Java install script
+        copy: src=files/java.sh dest=/tmp/java.sh mode=777 
+
+      - name: Extract JRE and build local repository
+        shell: cd /tmp && ./java.sh -7
+
+      - name: Install JRE
+        apt: pkg=oracle-java7-jre state=installed
+
+      - name: Cleanup Java install
+        shell: rm /tmp/java.sh

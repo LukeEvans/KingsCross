@@ -1,0 +1,13 @@
+---
+
+- name: Install-Datadog
+  hosts:
+  - tag_Name_reducto-frontend-01
+  - tag_Name_reducto-supervisor-01
+  user: ubuntu
+  sudo: true
+  gather_facts: false
+  tasks:
+      - name: Download and install datadog agent
+        shell: DD_API_KEY=217d46871a163b76bb1755077a84fa12 bash -c "$(wget -qO- http://dtdg.co/agent-install-ubuntu)"
+        

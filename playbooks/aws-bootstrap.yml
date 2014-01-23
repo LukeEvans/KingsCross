@@ -1,0 +1,31 @@
+---
+
+- name: Bootstrap Ansible
+  hosts: localhost
+  user: root
+  gather_facts: false
+  sudo: true
+
+  tasks:
+
+    - name: Get sbt .deb file
+      get_url: url=http://downloads.typesafe.com/akka/akka-2.2.3.zip dest=/tmp/ mode=0440
+
+    - name: Add .deb file 
+      local_action: shell cd /tmp && dpkg -i sbt.deb && apt-get update && apt-get -y install sbt && rm /tmp/sbt.deb
+
+    - name: Make Ansible directory
+      local_action: shell mkdir /etc/ansible/
+      ignore_errors: yes
+
+    - name: Copy ec2.py hosts file
+      local_action: shell cp files/hosts /etc/ansible/
+
+    - name: Copy ec2.ini file
+      local_action: shell cp files/ec2.ini /etc/ansible/
+
+    - name: Tell ec2 inventory we want aws internal ip
+      local_action: lineinfile dest=/etc/ansible/ec2.ini regexp='^destination_variable =' line='destination_variable = private_dns_name'
+
+    - name: Copy ansible.cfg
+      local_action: shell cp files/ansible.cfg /etc/ansible/

@@ -1,0 +1,21 @@
+---
+
+- name: Bootstrap upstart
+  hosts:
+  - tag_Name_reducto-seed-01
+  - tag_Name_reducto-frontend-01
+  - tag_Name_reducto-worker-01
+  - tag_Name_reducto-supervisor-01
+  - tag_Name_reducto-parser-01
+  user: ubuntu
+  sudo: true
+  gather_facts: false
+  tasks:
+      - name: Copy all upstart configs
+        copy: src=files/upstart/{{ item }} dest=/etc/init/
+        with_items:
+           - reducto-seed.conf
+           - reducto-frontend.conf
+           - reducto-supervisor.conf
+           - reducto-worker.conf
+           - reducto-parser.conf     

@@ -1,0 +1,101 @@
+- name: Launce Instances
+  hosts: local 
+  connection: local
+  user: root
+  gather_facts: false
+
+  vars:
+    keypair: Akka
+    security_group: Akka
+
+    # Instace types
+    seed_instance_type: m1.xlarge
+    backend_instance_type: m1.xlarge
+    frontend_instance_type: m1.xlarge
+
+    # Image (Ubuntu 12.04)
+    image: ami-a73264ce 
+
+    # Instance Counts
+    seed_count: 1
+    frontend_count: 1
+    backend_count: 1
+
+    # Region
+    region: us-east-1
+
+  user: ubuntu
+  tasks:
+
+    # Seed
+    - name: Launch seed instances
+      local_action: ec2 keypair={{keypair}} group={{security_group}} instance_type={{seed_instance_type}} image={{image}} wait=true count={{seed_count}} region={{region}} instance_tags='{"Name":"reducto-seed-01"}'
+      register: ec2
+    - name: Add all seed instance public IPs to host group
+      local_action: add_host hostname={{item.public_ip}} groupname=launched ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/home/ubuntu/.ssh/Akka.pem
+      with_items: ec2.instances
+    - name: Create volumes and attach
+      local_action: ec2_vol instance={{item.id}} volume_size=8 region={{region}} device_name=xvdf
+      with_items: ec2.instances
+      register: ec2_vol
+    - name: Wait for ssh to come up
+      local_action: wait_for host={{item.public_dns_name}} port=22 timeout=320 state=started
+      with_items: ec2.instances
+
+    # Frontend
+    - name: Launch frontend instances
+      local_action: ec2 keypair={{keypair}} group={{security_group}} instance_type={{frontend_instance_type}} image={{image}} wait=true count={{frontend_count}} region={{region}} instance_tags='{"Name":"reducto-frontend-01"}'
+      register: ec2
+    - name: Add all frontend instance public IPs to host group
+      local_action: add_host hostname={{item.public_ip}} groupname=launched ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/home/ubuntu/.ssh/Akka.pem
+      with_items: ec2.instances
+    - name: Create volumes and attach
+      local_action: ec2_vol instance={{item.id}} volume_size=8 region={{region}} device_name=xvdf
+      with_items: ec2.instances
+      register: ec2_vol
+    - name: Wait for ssh to come up
+      local_action: wait_for host={{item.public_dns_name}} port=22 timeout=320 state=started
+      with_items: ec2.instances
+ 
+    # Backend
+    - name: Launch backend instances
+      local_action: ec2 keypair={{keypair}} group={{security_group}} instance_type={{backend_instance_type}} image={{image}} wait=true count={{backend_count}} region={{region}} instance_tags='{"Name":"reducto-backend-01"}'
+      register: ec2
+    - name: Add all backend instance public IPs to host group
+      local_action: add_host hostname={{item.public_ip}} groupname=launched ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/home/ubuntu/.ssh/Akka.pem
+      with_items: ec2.instances
+    - name: Create volumes and attach
+      local_action: ec2_vol instance={{item.id}} volume_size=8 region={{region}} device_name=xvdf
+      with_items: ec2.instances
+      register: ec2_vol
+    - name: Wait for ssh to come up
+      local_action: wait_for host={{item.public_dns_name}} port=22 timeout=320 state=started
+      with_items: ec2.instances
+
+
+- name: Install Packages
+  hosts: launched 
+  user: ubuntu
+  sudo: true
+  gather_facts: true
+  tasks:
+      - name: Update apt cache
+        action: apt update_cache=yes 
+
+      - name: Install Git
+        action: apt pkg='git' state=present
+
+      - name: Install wget package
+        action: apt pkg='wget' state=installed
+
+      - name: Copy Java install script
+        copy: src=files/java.sh dest=/tmp/java.sh mode=777 
+
+      - name: Extract JRE and build local repository
+        shell: cd /tmp && ./java.sh -7
+
+      - name: Install JRE
+        apt: pkg=oracle-java7-jre state=installed
+
+      - name: Cleanup Java install
+        shell: rm /tmp/java.sh

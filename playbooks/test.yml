@@ -1,0 +1,14 @@
+---
+
+- name: Get Instances Stats
+  hosts:
+  - tag_Name_reducto-frontend-01
+  user: ubuntu
+  sudo: true
+  gather_facts: true
+  tasks:
+      - name: Download Akka
+        get_url: url=http://downloads.typesafe.com/akka/akka-2.2.3.zip dest=/usr/lib/akka.zip mode=0440
+
+      - name: Unzip Akka
+        shell: cd /usr/lib && unzip akka.zip
