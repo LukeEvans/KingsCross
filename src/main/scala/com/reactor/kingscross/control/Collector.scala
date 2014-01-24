@@ -6,18 +6,24 @@ import com.reactor.kingscross.config.Config
 import akka.contrib.pattern.DistributedPubSubExtension
 import akka.contrib.pattern.DistributedPubSubMediator._
 import com.reactor.kingscross.config.NewsConfig
+import com.fasterxml.jackson.databind.JsonNode
 
 abstract class Collector(config:Config) extends Actor with ActorLogging {
 
   // Required to be implemented
-  def handleEvent(event: Any): Unit
-  mediator ! Subscribe(config.read_channel, self)
+  def handleEvent(event: EmitEvent): Unit
   
-  val nc = new NewsConfig("google.com", 4, "in", "out")
   val mediator = DistributedPubSubExtension(context.system).mediator
+
+  val read_channel = config.collect_channel
+  val write_channel = config.store_channel
+
+  mediator ! Subscribe(read_channel, self)
   
-  val read_channel = config.read_channel
-  val write_channel = config.write_channel
+  // publish event back to bus
+  def publish(event:JsonNode) {
+     mediator ! Publish(write_channel, CollectEvent(event))
+  }
   
   def receive = {
     case SubscribeAck(Subscribe(read_channel, `self`)) =>
@@ -25,6 +31,6 @@ abstract class Collector(config:Config) extends Actor with ActorLogging {
   }
   
   def ready: Actor.Receive = {
-	  	case event:Any => handleEvent(event) 
-	}  
+	  case event:EmitEvent => handleEvent(event) 
+  }  
 }

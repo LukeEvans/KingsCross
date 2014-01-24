@@ -10,10 +10,11 @@ import akka.cluster.ClusterEvent.ClusterDomainEvent
 import com.reactor.base.patterns.listeners.Listener
 import akka.cluster.ClusterEvent.ClusterDomainEvent
 import com.reactor.base.patterns.listeners.Listener
+import com.reactor.kingscross.bootstrap.NewsBootstrap
 
 class KingsCross extends Bootable {
 	val ip = IPTools.getPrivateIp();
-	val config = ConfigFactory.empty.withFallback(ConfigFactory.parseString("akka.cluster.roles = [kingscross-worker]\nakka.remote.netty.tcp.hostname=\""+ip+"\"")).withFallback(ConfigFactory.load("kingscross"))
+	val config = ConfigFactory.empty.withFallback(ConfigFactory.parseString("akka.cluster.roles = [kc-frontend]\nakka.remote.netty.tcp.hostname=\""+ip+"\"\nakka.remote.netty.tcp.port=2551")).withFallback(ConfigFactory.load("kingscross"))
     val system = ActorSystem("KingsCross-01", config)
     
     // Startup 
@@ -23,7 +24,8 @@ class KingsCross extends Bootable {
 		 val clusterListener = system.actorOf(Props(classOf[Listener], system), name = "clusterListener") 
 		 Cluster(system).subscribe(clusterListener, classOf[ClusterDomainEvent])
 		 
-		 
+		 // Bootstrap news
+		 val news = system.actorOf(Props[NewsBootstrap])
 	}
 
 	def shutdown(){
