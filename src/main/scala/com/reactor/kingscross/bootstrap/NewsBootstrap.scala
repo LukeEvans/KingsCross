@@ -15,10 +15,10 @@ class NewsBootstrap extends Actor with ActorLogging {
   context.actorOf(Props(classOf[NewsStorageBuilder], new Config(emitChannel="/news", collectChannel="/news", storeChannel="/news")))
   
   // General news
-  val bbc = context.actorOf(Props(classOf[News], new NewsConfig(id="bbc-health", url="www.bbc-health.com", emitChannel="/news", collectChannel="/news", storeChannel="/news", pollTime=1)))
+  val bbc = context.actorOf(Props(classOf[News], new NewsConfig(id="bbc-health", url="www.bbc-health.com", pollTime=1)))
   
   // Custom news
-  val techcrunch = context.actorOf(Props(classOf[Techcrunch], new NewsConfig(id="techcrunch", url="www.techcrunch.com", emitChannel="/news/techcrunch", collectChannel="/news/techcrunch", storeChannel="/news", pollTime=15)))
+  val techcrunch = context.actorOf(Props(classOf[Techcrunch], new NewsConfig(id="techcrunch", url="www.techcrunch.com", emitChannel="/news/techcrunch", collectChannel="/news/techcrunch", pollTime=15)))
   
   
   

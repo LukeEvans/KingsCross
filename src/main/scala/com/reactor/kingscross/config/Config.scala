@@ -25,7 +25,7 @@ class PollingConfig() extends Config {
 
 class NewsConfig() extends PollingConfig {
   
-  def this(id:String, url:String, emitChannel:String, collectChannel:String, storeChannel:String, pollTime:Int) {
+  def this(id:String, url:String, emitChannel:String="/news", collectChannel:String = "/news", storeChannel:String = "/news", pollTime:Int) {
 	 this()
 	 
 	 emit_channel = "emit-" + emitChannel
