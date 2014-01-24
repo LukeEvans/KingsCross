@@ -37,7 +37,7 @@ class ApiActor(accio:ActorRef) extends Actor with ApiService {
   // Set the target
   throttler ! SetTarget(Some(dispatcher))
   
-implicit def AccioExceptionHandler(implicit log: LoggingContext) =
+implicit def CustomExceptionHandler(implicit log: LoggingContext) =
   ExceptionHandler {
     case e: NoSuchElementException => ctx =>
       println("no element")

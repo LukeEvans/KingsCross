@@ -29,7 +29,7 @@ class ApiBoot extends Bootable {
 	val config = ConfigFactory.parseString(s"akka.remote.netty.tcp.port=2552") 
       .withFallback(ConfigFactory.parseString("akka.cluster.roles = [accio-frontend]\nakka.remote.netty.tcp.hostname=\""+ip+"\"")).withFallback(ConfigFactory.load("accio"))
       
-    implicit val system = ActorSystem("Accio-0-1", config)
+    implicit val system = ActorSystem("KingsCross-01", config)
         
     //#registerOnUp
     Cluster(system) registerOnMemberUp {

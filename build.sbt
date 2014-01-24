@@ -24,6 +24,8 @@ libraryDependencies += "com.typesafe.akka" % "akka-kernel_2.10" % "2.2.3"
 
 libraryDependencies += "com.typesafe.akka" % "akka-cluster_2.10" % "2.2.3"
 
+libraryDependencies += "com.typesafe.akka" % "akka-contrib_2.10" % "2.2.3"
+
 libraryDependencies += "com.typesafe" % "config" % "1.0.2"
 
 libraryDependencies += "edu.stanford.nlp" % "stanford-corenlp" % "3.2.0" artifacts (Artifact("stanford-corenlp", "models"), Artifact("stanford-corenlp")) 

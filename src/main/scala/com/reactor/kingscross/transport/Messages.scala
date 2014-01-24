@@ -21,4 +21,7 @@ case class OverloadedDispatchRequest(message:Any)
 case class HttpObject(uri: String, obj: JsonNode = null, response: JsonNode = null, method: String = "GET") 
 case class JsonResponse(node: JsonNode)
 
+// General InitRequest
+case object InitRequest
+
 }
