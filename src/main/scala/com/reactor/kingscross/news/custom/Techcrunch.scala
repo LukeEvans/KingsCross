@@ -8,13 +8,16 @@ import akka.actor.Props
 import com.reactor.kingscross.config.PollingConfig
 import com.reactor.kingscross.news.NewsEmitter
 import com.reactor.kingscross.control.CollectorArgs
+import com.reactor.base.patterns.pull.FlowControlConfig
+import com.reactor.base.patterns.pull.FlowControlFactory
 
 class Techcrunch(config:PollingConfig) extends Actor {
 	val emmitter = context.actorOf(Props(classOf[NewsEmitter], config))
 
 	// Collector
-	val collector = context.actorOf(Props(classOf[TechCrunchCollector], config))
-  
+	val flowConfig = FlowControlConfig(name="techcrunshCollector", actorType="TechCrunchCollector")
+	val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
+	
 	// Ignore messages
 	def receive = { case _ => }	
 }

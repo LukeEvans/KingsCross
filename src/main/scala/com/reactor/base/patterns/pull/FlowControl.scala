@@ -30,7 +30,7 @@ abstract class FlowControlArgs {
   
 }
 
-case class FlowControlConfig(name:String, actorType:String, parallel:Int=1, role:String)
+case class FlowControlConfig(name:String, actorType:String, parallel:Int=1, role:String="kc-frontend")
 
 object FlowControlFactory extends {
   def flowControlledActorFor(context:ActorContext, flowConfig:FlowControlConfig, args:FlowControlArgs): ActorRef = {
