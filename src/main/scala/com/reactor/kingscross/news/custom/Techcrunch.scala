@@ -7,6 +7,7 @@ import akka.actor.Actor
 import akka.actor.Props
 import com.reactor.kingscross.config.PollingConfig
 import com.reactor.kingscross.news.NewsEmitter
+import com.reactor.kingscross.control.CollectorArgs
 
 class Techcrunch(config:PollingConfig) extends Actor {
 	val emmitter = context.actorOf(Props(classOf[NewsEmitter], config))
@@ -19,7 +20,7 @@ class Techcrunch(config:PollingConfig) extends Actor {
 }
 
 // Collect News
-class TechCrunchCollector(config:Config) extends Collector(config) {
+class TechCrunchCollector(args:CollectorArgs) extends Collector(args) {
   
   def handleEvent(event:EmitEvent) {
 	  println("TC Collector: Collecting story - " + event.data)

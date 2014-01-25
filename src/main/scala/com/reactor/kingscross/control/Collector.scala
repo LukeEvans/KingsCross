@@ -2,14 +2,22 @@ package com.reactor.kingscross.control
 
 import akka.actor.Actor
 import akka.actor.ActorLogging
-import com.reactor.kingscross.config.Config
 import akka.contrib.pattern.DistributedPubSubExtension
 import akka.contrib.pattern.DistributedPubSubMediator._
 import com.reactor.kingscross.config.NewsConfig
 import com.fasterxml.jackson.databind.JsonNode
+import com.reactor.base.patterns.pull._
+import akka.actor.ActorRef
+import com.reactor.kingscross.config.Config
 
-abstract class Collector(config:Config) extends Actor with ActorLogging {
+case class CollectorArgs(val config:Config) extends FlowControlArgs
 
+abstract class Collector(args:CollectorArgs) extends FlowControlActor(args) {
+
+  // Save config
+  val config = args.config
+  val master = args.master
+  
   // Required to be implemented
   def handleEvent(event: EmitEvent): Unit
   
@@ -18,7 +26,10 @@ abstract class Collector(config:Config) extends Actor with ActorLogging {
   val read_channel = config.collect_channel
   val write_channel = config.store_channel
 
-  mediator ! Subscribe(read_channel, self)
+  mediator ! Subscribe(read_channel, master)
+  
+  // Ready for work
+  ready()
   
   // publish event back to bus
   def publish(event:JsonNode) {
@@ -26,11 +37,6 @@ abstract class Collector(config:Config) extends Actor with ActorLogging {
   }
   
   def receive = {
-    case SubscribeAck(Subscribe(read_channel, `self`)) =>
-      context become ready
+    case event:EmitEvent => handleEvent(event) 
   }
-  
-  def ready: Actor.Receive = {
-	  case event:EmitEvent => handleEvent(event) 
-  }  
 }

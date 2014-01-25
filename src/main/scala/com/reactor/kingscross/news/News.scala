@@ -7,11 +7,8 @@ import com.reactor.kingscross.control.Collector
 import scala.util.Random
 import com.reactor.kingscross.config._
 import akka.actor.Props
-import com.reactor.kingscross.control.Storer
-import com.reactor.kingscross.control.FetchEvent
-import com.reactor.kingscross.control.EmitEvent
-import com.reactor.kingscross.control.CollectEvent
-import com.reactor.kingscross.control.CollectEvent
+import com.reactor.kingscross.control._
+import com.reactor.base.patterns.pull._
 
 class News(config:PollingConfig) extends Actor {
 
@@ -19,7 +16,9 @@ class News(config:PollingConfig) extends Actor {
   val emmitter = context.actorOf(Props(classOf[NewsEmitter], config))
   
   // Collector
-  val collector = context.actorOf(Props(classOf[NewsCollector], config))
+  val flowConfig = FlowControlConfig(name="newsCollector", actorType="NewsCollector", role="kc-frontend")
+  val args = CollectorArgs(config=config)
+  val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, args)
  
   // Ignore messages
   def receive = { case _ => }    
@@ -48,7 +47,9 @@ class NewsEmitter(config:PollingConfig) extends Emitter(config) {
 }
 
 // Collect News
-class NewsCollector(config:Config) extends Collector(config) {
+class NewsCollector(args:CollectorArgs) extends Collector(args) {
+  
+  val conf = args.config
   
   def handleEvent(event:EmitEvent) {
     
@@ -61,6 +62,9 @@ class NewsCollector(config:Config) extends Collector(config) {
       publish(event.data)
       	
       Thread.sleep(5000)
+      
+      // Completed event
+      complete()
   }  
 }
 
