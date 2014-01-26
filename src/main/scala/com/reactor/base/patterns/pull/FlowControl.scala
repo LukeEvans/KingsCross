@@ -10,7 +10,7 @@ import akka.actor.ActorLogging
 import com.reactor.base.patterns.pull.MasterWorkerProtocol._
 import akka.actor.ActorContext
 
-abstract class FlowControlArgs {
+abstract class FlowControlArgs() {
   var master:ActorRef = null
   var manager:ActorRef = null
   
@@ -59,7 +59,7 @@ class FlowControlWorker(config:FlowControlConfig, args:FlowControlArgs) extends 
   args.addFlowConfig(config)
   
   // Start actor that will handle the actual work
-  val actor = context.actorOf(Props(Class.forName(config.actorType).asInstanceOf[Class[Actor]], args))
+  val actor = context.actorOf(Props(Class.forName(config.actorType).asInstanceOf[Class[FlowControlActor]], args))
   
   // Handle work
   def doWork(workSender: ActorRef, msg: Any): Unit = {

@@ -8,19 +8,26 @@ import com.reactor.kingscross.config.NewsConfig
 import com.reactor.kingscross.news.custom.Techcrunch
 import com.reactor.kingscross.news.NewsStorageBuilder
 import com.reactor.kingscross.config.Config
+import com.reactor.base.patterns.pull.FlowControlFactory
+import com.reactor.base.patterns.pull.FlowControlConfig
+import com.reactor.base.patterns.pull.FlowControlArgs
+import com.reactor.kingscross.test.TestArgs
 
 class NewsBootstrap extends Actor with ActorLogging {
 	
   // Set up singleton storers
-  context.actorOf(Props(classOf[NewsStorageBuilder], new Config(emitChannel="/news", collectChannel="/news", storeChannel="/news")))
+//  context.actorOf(Props(classOf[NewsStorageBuilder], new Config(emitChannel="/news", collectChannel="/news", storeChannel="/news")))
   
   // General news
-  val bbc = context.actorOf(Props(classOf[News], new NewsConfig(id="bbc-health", url="www.bbc-health.com", pollTime=1)))
+//  val bbc = context.actorOf(Props(classOf[News], new NewsConfig(id="bbc-health", url="www.bbc-health.com", pollTime=1)))
   
   // Custom news
-  val techcrunch = context.actorOf(Props(classOf[Techcrunch], new NewsConfig(id="techcrunch", url="www.techcrunch.com", emitChannel="/news/techcrunch", collectChannel="/news/techcrunch", pollTime=15)))
+//  val techcrunch = context.actorOf(Props(classOf[Techcrunch], new NewsConfig(id="techcrunch", url="www.techcrunch.com", emitChannel="/news/techcrunch", collectChannel="/news/techcrunch", pollTime=15)))
   
+  val flowConfig = FlowControlConfig(name="flowTest", actorType="com.reactor.kingscross.test.TestActor")
+  val test = FlowControlFactory.flowControlledActorFor(context, flowConfig, TestArgs(42))
   
+  test ! "What size is you ship?"
   
   // Ignore messages
   def receive = { case _ => }
