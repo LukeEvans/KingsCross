@@ -12,10 +12,11 @@ import com.reactor.base.patterns.pull.FlowControlConfig
 import com.reactor.base.patterns.pull.FlowControlFactory
 
 class Techcrunch(config:PollingConfig) extends Actor {
+  
 	val emmitter = context.actorOf(Props(classOf[NewsEmitter], config))
 
 	// Collector
-	val flowConfig = FlowControlConfig(name="techcrunshCollector", actorType="TechCrunchCollector")
+	val flowConfig = FlowControlConfig(name="techcrunshCollector", actorType="com.reactor.kingscross.news.custom.TechCrunchCollector")
 	val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
 	
 	// Ignore messages
@@ -30,5 +31,7 @@ class TechCrunchCollector(args:CollectorArgs) extends Collector(args) {
       publish(event.data)
       	
       Thread.sleep(5000)
+      
+      complete()
   }  
 }

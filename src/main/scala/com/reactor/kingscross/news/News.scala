@@ -16,7 +16,7 @@ class News(config:PollingConfig) extends Actor {
   val emmitter = context.actorOf(Props(classOf[NewsEmitter], config))
   
   // Collector
-  val flowConfig = FlowControlConfig(name="newsCollector", actorType="NewsCollector", role="kc-frontend")
+  val flowConfig = FlowControlConfig(name="newsCollector", actorType="com.reactor.kingscross.news.NewsCollector")
   val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
  
   // Ignore messages
