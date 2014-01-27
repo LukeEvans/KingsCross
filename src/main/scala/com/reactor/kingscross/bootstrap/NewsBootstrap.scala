@@ -11,7 +11,9 @@ import com.reactor.kingscross.config.Config
 import com.reactor.base.patterns.pull.FlowControlFactory
 import com.reactor.base.patterns.pull.FlowControlConfig
 import com.reactor.base.patterns.pull.FlowControlArgs
-import com.reactor.kingscross.test.TestArgs
+import com.reactor.base.patterns.pull.FlowControlConfig
+import com.reactor.kingscross.control.CollectorArgs
+import com.reactor.kingscross.config.NewsConfig
 
 class NewsBootstrap extends Actor with ActorLogging {
 	

@@ -74,16 +74,25 @@ class NewsCollector(args:CollectorArgs) extends Collector(args) {
 class NewsStorageBuilder(config:Config) extends Actor {
 
   // Storers
-  val mongoStorer = context.actorOf(Props(classOf[NewsMongoStorer], config))
-  val esStorer = context.actorOf(Props(classOf[NewsESStorer], config))
-  val graphStorer = context.actorOf(Props(classOf[NewsTitanStorer], config))
+  
+  // Mongo
+  val mongoFlowConfig = FlowControlConfig(name="newsMongoStorer", actorType="com.reactor.kingscross.news.NewsMongoStorer")
+  val mongoStorer = FlowControlFactory.flowControlledActorFor(context, mongoFlowConfig, StorerArgs(config=config))
+  
+  // Elasticsearch
+  val esFlowConfig = FlowControlConfig(name="newsMongoStorer", actorType="com.reactor.kingscross.news.NewsESStorer")
+  val esStorer = FlowControlFactory.flowControlledActorFor(context, esFlowConfig, StorerArgs(config=config))
+  
+  // Titan
+  val titanFlowConfig = FlowControlConfig(name="newsMongoStorer", actorType="com.reactor.kingscross.news.NewsTitanStorer")
+  val titanStorer = FlowControlFactory.flowControlledActorFor(context, titanFlowConfig, StorerArgs(config=config))  
   
   // Ignore messages
   def receive = { case _ => }  
 }
 
 // Mongo
-class NewsMongoStorer(config:Config) extends Storer(config) {
+class NewsMongoStorer(args:StorerArgs) extends Storer(args) {
    
   def handleEvent(event:CollectEvent) {
     
@@ -96,11 +105,13 @@ class NewsMongoStorer(config:Config) extends Storer(config) {
       	publish(event.data)
       	
       	Thread.sleep(10000)
+      	
+      	complete()
   }   
 }
 
 // Elasticsearch
-class NewsESStorer(config:Config) extends Storer(config) {
+class NewsESStorer(args:StorerArgs) extends Storer(args) {
    
   def handleEvent(event:CollectEvent) {
     
@@ -113,11 +124,13 @@ class NewsESStorer(config:Config) extends Storer(config) {
       	publish(event.data)
       	
       	Thread.sleep(2000)
+      	
+      	complete()
   }   
 }
 
 // Titan
-class NewsTitanStorer(config:Config) extends Storer(config) {
+class NewsTitanStorer(args:StorerArgs) extends Storer(args) {
    
   def handleEvent(event:CollectEvent) {
 
@@ -130,5 +143,7 @@ class NewsTitanStorer(config:Config) extends Storer(config) {
       	publish(event.data)
       	
       	Thread.sleep(7000)
+      	
+      	complete()
   }   
 }
