@@ -7,11 +7,8 @@ import com.reactor.kingscross.control.Collector
 import scala.util.Random
 import com.reactor.kingscross.config._
 import akka.actor.Props
-import com.reactor.kingscross.control.Storer
-import com.reactor.kingscross.control.FetchEvent
-import com.reactor.kingscross.control.EmitEvent
-import com.reactor.kingscross.control.CollectEvent
-import com.reactor.kingscross.control.CollectEvent
+import com.reactor.kingscross.control._
+import com.reactor.base.patterns.pull._
 
 class News(config:PollingConfig) extends Actor {
 
@@ -19,7 +16,8 @@ class News(config:PollingConfig) extends Actor {
   val emmitter = context.actorOf(Props(classOf[NewsEmitter], config))
   
   // Collector
-  val collector = context.actorOf(Props(classOf[NewsCollector], config))
+  val flowConfig = FlowControlConfig(name="newsCollector", actorType="com.reactor.kingscross.news.NewsCollector")
+  val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
  
   // Ignore messages
   def receive = { case _ => }    
@@ -48,7 +46,9 @@ class NewsEmitter(config:PollingConfig) extends Emitter(config) {
 }
 
 // Collect News
-class NewsCollector(config:Config) extends Collector(config) {
+class NewsCollector(args:CollectorArgs) extends Collector(args) {
+  
+  val conf = args.config
   
   def handleEvent(event:EmitEvent) {
     
@@ -61,6 +61,9 @@ class NewsCollector(config:Config) extends Collector(config) {
       publish(event.data)
       	
       Thread.sleep(5000)
+      
+      // Completed event
+      complete()
   }  
 }
 
@@ -71,16 +74,25 @@ class NewsCollector(config:Config) extends Collector(config) {
 class NewsStorageBuilder(config:Config) extends Actor {
 
   // Storers
-  val mongoStorer = context.actorOf(Props(classOf[NewsMongoStorer], config))
-  val esStorer = context.actorOf(Props(classOf[NewsESStorer], config))
-  val graphStorer = context.actorOf(Props(classOf[NewsTitanStorer], config))
+  
+  // Mongo
+  val mongoFlowConfig = FlowControlConfig(name="newsMongoStorer", actorType="com.reactor.kingscross.news.NewsMongoStorer")
+  val mongoStorer = FlowControlFactory.flowControlledActorFor(context, mongoFlowConfig, StorerArgs(config=config))
+  
+  // Elasticsearch
+  val esFlowConfig = FlowControlConfig(name="newsMongoStorer", actorType="com.reactor.kingscross.news.NewsESStorer")
+  val esStorer = FlowControlFactory.flowControlledActorFor(context, esFlowConfig, StorerArgs(config=config))
+  
+  // Titan
+  val titanFlowConfig = FlowControlConfig(name="newsMongoStorer", actorType="com.reactor.kingscross.news.NewsTitanStorer")
+  val titanStorer = FlowControlFactory.flowControlledActorFor(context, titanFlowConfig, StorerArgs(config=config))  
   
   // Ignore messages
   def receive = { case _ => }  
 }
 
 // Mongo
-class NewsMongoStorer(config:Config) extends Storer(config) {
+class NewsMongoStorer(args:StorerArgs) extends Storer(args) {
    
   def handleEvent(event:CollectEvent) {
     
@@ -93,11 +105,13 @@ class NewsMongoStorer(config:Config) extends Storer(config) {
       	publish(event.data)
       	
       	Thread.sleep(10000)
+      	
+      	complete()
   }   
 }
 
 // Elasticsearch
-class NewsESStorer(config:Config) extends Storer(config) {
+class NewsESStorer(args:StorerArgs) extends Storer(args) {
    
   def handleEvent(event:CollectEvent) {
     
@@ -110,11 +124,13 @@ class NewsESStorer(config:Config) extends Storer(config) {
       	publish(event.data)
       	
       	Thread.sleep(2000)
+      	
+      	complete()
   }   
 }
 
 // Titan
-class NewsTitanStorer(config:Config) extends Storer(config) {
+class NewsTitanStorer(args:StorerArgs) extends Storer(args) {
    
   def handleEvent(event:CollectEvent) {
 
@@ -127,5 +143,7 @@ class NewsTitanStorer(config:Config) extends Storer(config) {
       	publish(event.data)
       	
       	Thread.sleep(7000)
+      	
+      	complete()
   }   
 }

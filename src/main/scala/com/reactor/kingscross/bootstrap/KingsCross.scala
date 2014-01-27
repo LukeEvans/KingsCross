@@ -11,6 +11,7 @@ import com.reactor.base.patterns.listeners.Listener
 import akka.cluster.ClusterEvent.ClusterDomainEvent
 import com.reactor.base.patterns.listeners.Listener
 import com.reactor.kingscross.bootstrap.NewsBootstrap
+import com.reactor.base.patterns.pull.FlowControlFactory
 
 class KingsCross extends Bootable {
 	val ip = IPTools.getPrivateIp();
@@ -26,6 +27,7 @@ class KingsCross extends Bootable {
 		 
 		 // Bootstrap news
 		 val news = system.actorOf(Props[NewsBootstrap])
+		 
 	}
 
 	def shutdown(){

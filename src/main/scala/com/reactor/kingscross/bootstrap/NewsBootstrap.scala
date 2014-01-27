@@ -8,6 +8,12 @@ import com.reactor.kingscross.config.NewsConfig
 import com.reactor.kingscross.news.custom.Techcrunch
 import com.reactor.kingscross.news.NewsStorageBuilder
 import com.reactor.kingscross.config.Config
+import com.reactor.base.patterns.pull.FlowControlFactory
+import com.reactor.base.patterns.pull.FlowControlConfig
+import com.reactor.base.patterns.pull.FlowControlArgs
+import com.reactor.base.patterns.pull.FlowControlConfig
+import com.reactor.kingscross.control.CollectorArgs
+import com.reactor.kingscross.config.NewsConfig
 
 class NewsBootstrap extends Actor with ActorLogging {
 	
@@ -19,8 +25,6 @@ class NewsBootstrap extends Actor with ActorLogging {
   
   // Custom news
   val techcrunch = context.actorOf(Props(classOf[Techcrunch], new NewsConfig(id="techcrunch", url="www.techcrunch.com", emitChannel="/news/techcrunch", collectChannel="/news/techcrunch", pollTime=15)))
-  
-  
   
   // Ignore messages
   def receive = { case _ => }
