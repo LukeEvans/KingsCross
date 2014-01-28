@@ -18,13 +18,13 @@ import com.reactor.kingscross.config.NewsConfig
 class NewsBootstrap extends Actor with ActorLogging {
 	
   // Set up singleton storers
-  context.actorOf(Props(classOf[NewsStorageBuilder], new Config(emitChannel="/news", collectChannel="/news", storeChannel="/news")))
+  context.actorOf(Props(classOf[NewsStorageBuilder], new Config(emitPlatform="/news", collectPlatform="/news", storePlatform="/news")))
   
   // General news
   val bbc = context.actorOf(Props(classOf[News], new NewsConfig(id="bbc-health", url="www.bbc-health.com", pollTime=1)))
   
   // Custom news
-  val techcrunch = context.actorOf(Props(classOf[Techcrunch], new NewsConfig(id="techcrunch", url="www.techcrunch.com", emitChannel="/news/techcrunch", collectChannel="/news/techcrunch", pollTime=15)))
+  val techcrunch = context.actorOf(Props(classOf[Techcrunch], new NewsConfig(id="techcrunch", url="www.techcrunch.com", emitPlatform="/news/techcrunch", collectPlatform="/news/techcrunch", pollTime=15)))
   
   // Ignore messages
   def receive = { case _ => }

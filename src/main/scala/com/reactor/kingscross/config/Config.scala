@@ -4,17 +4,17 @@ import scala.util.Random
 
 class Config {
   
-  var emit_channel:String = "default_emit"
-  var collect_channel:String = "default_collect"
-  var store_channel:String = "default_store"
-  var complete_channel:String = "default_complete"
+  var emit_platform:String = "default_emit"
+  var collect_platform:String = "default_collect"
+  var store_platform:String = "default_store"
+  var complete_platform:String = "default_complete"
     
-  def this(emitChannel:String, collectChannel:String, storeChannel:String) {
+  def this(emitPlatform:String, collectPlatform:String, storePlatform:String) {
 	this()
-	 emit_channel = "emit-" + emitChannel
-	 collect_channel = "collect-" + collectChannel
-	 store_channel = "store-" + storeChannel
-	 complete_channel = "complete-" + emitChannel
+	 emit_platform = "emit-" + emitPlatform
+	 collect_platform = "collect-" + collectPlatform
+	 store_platform = "store-" + storePlatform
+	 complete_platform = "complete-" + emitPlatform
   }
 }
 
@@ -25,13 +25,13 @@ class PollingConfig() extends Config {
 
 class NewsConfig() extends PollingConfig {
   
-  def this(id:String, url:String, emitChannel:String="/news", collectChannel:String = "/news", storeChannel:String = "/news", pollTime:Int) {
+  def this(id:String, url:String, emitPlatform:String="/news", collectPlatform:String = "/news", storePlatform:String = "/news", pollTime:Int) {
 	 this()
 	 
-	 emit_channel = "emit-" + emitChannel
-	 collect_channel = "collect-" + collectChannel
-	 store_channel = "store-" + storeChannel
-	 complete_channel = "complete-" + emitChannel
+	 emit_platform = "emit-" + emitPlatform
+	 collect_platform = "collect-" + collectPlatform
+	 store_platform = "store-" + storePlatform
+	 complete_platform = "complete-" + emitPlatform
 	 
 	 start_delay = Random.nextInt % 5
 	 poll_time = pollTime
