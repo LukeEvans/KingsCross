@@ -9,7 +9,7 @@ class Config {
   var store_platform:String = "default_store"
   var complete_platform:String = "default_complete"
     
-  def this(emitPlatform:String, collectPlatform:String, storePlatform:String) {
+  def this(emitPlatform:String = "undefined", collectPlatform:String = "undefined", storePlatform:String = "undefined") {
 	this()
 	 emit_platform = "emit-" + emitPlatform
 	 collect_platform = "collect-" + collectPlatform
@@ -36,4 +36,18 @@ class NewsConfig() extends PollingConfig {
 	 start_delay = Random.nextInt % 5
 	 poll_time = pollTime
   }
+}
+
+class TwitterConfig() extends PollingConfig {
+  def this(id:String, handle:String, emitPlatform:String="/twitter", collectPlatform:String = "/twitter", storePlatform:String = "/twitter", pollTime:Int) {
+	 this()
+	 
+	 emit_platform = "emit-" + emitPlatform
+	 collect_platform = "collect-" + collectPlatform
+	 store_platform = "store-" + storePlatform
+	 complete_platform = "complete-" + emitPlatform
+	 
+	 start_delay = Random.nextInt % 5
+	 poll_time = pollTime
+  }  
 }
