@@ -23,17 +23,17 @@ abstract class Collector(args:CollectorArgs) extends FlowControlActor(args) {
   
   val mediator = DistributedPubSubExtension(context.system).mediator
 
-  val read_channel = config.collect_channel
-  val write_channel = config.store_channel
+  val read_platform = config.collect_platform
+  val write_platform = config.store_platform
 
-  mediator ! Subscribe(read_channel, master)
+  mediator ! Subscribe(read_platform, master)
   
   // Ready for work
   ready()
   
   // publish event back to bus
   def publish(event:JsonNode) {
-     mediator ! Publish(write_channel, CollectEvent(event))
+     mediator ! Publish(write_platform, CollectEvent(event))
   }
   
   def receive = {

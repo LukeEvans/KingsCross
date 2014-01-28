@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.reactor.base.patterns.pull.FlowControlArgs
 import com.reactor.base.patterns.pull.FlowControlActor
 
-case class StorerArgs(val config:Config) extends FlowControlArgs
+case class StorerArgs(config:Config, storeType:String) extends FlowControlArgs
 
 abstract class Storer(args:StorerArgs) extends FlowControlActor(args) {
 
@@ -20,17 +20,17 @@ abstract class Storer(args:StorerArgs) extends FlowControlActor(args) {
   // Required to be implemented
   def handleEvent(event: CollectEvent)
   
-  val read_channel = config.store_channel
-  val write_channel = config.complete_channel
+  val read_platform = config.store_platform
+  val write_platform = config.complete_platform
   val mediator = DistributedPubSubExtension(context.system).mediator
-  mediator ! Subscribe(read_channel, master)
+  mediator ! Subscribe(read_platform, master)
 
   // Ready for work
   ready()
   
   // publish event to bus
   def publish(event:JsonNode) {
-	  mediator ! Publish(write_channel, StoreEvent(event))
+	  mediator ! Publish(write_platform, StoreEvent(event))
   }
   
   def receive = {
