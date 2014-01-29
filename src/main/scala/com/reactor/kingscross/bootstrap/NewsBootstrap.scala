@@ -45,7 +45,8 @@ class NewsBootstrap extends Actor with ActorLogging {
   // General news 
   //================================================================================
   def general() {
-    val bbc = context.actorOf(Props(classOf[News], new NewsConfig(id="bbc-health", url="www.bbc-health.com", pollTime=1)))
+    val atlantic = context.actorOf(Props(classOf[News], new NewsConfig(id="atlantic",url="http://feeds.feedburner.com/TheAtlantic?format=xml",pollTime=10)))
+    //val bbc = context.actorOf(Props(classOf[News], new NewsConfig(id="bbc-health", url="www.bbc-health.com", pollTime=1)))
   }
   
   
@@ -53,7 +54,7 @@ class NewsBootstrap extends Actor with ActorLogging {
   // Custom News 
   //================================================================================
   def custom() {
-	val techcrunch = context.actorOf(Props(classOf[Techcrunch], new NewsConfig(id="techcrunch", url="www.techcrunch.com", emitPlatform="/news/techcrunch", collectPlatform="/news/techcrunch", pollTime=15)))    
+	//val techcrunch = context.actorOf(Props(classOf[Techcrunch], new NewsConfig(id="techcrunch", url="www.techcrunch.com", emitPlatform="/news/techcrunch", collectPlatform="/news/techcrunch", pollTime=15)))    
   }
   
   // Ignore messages

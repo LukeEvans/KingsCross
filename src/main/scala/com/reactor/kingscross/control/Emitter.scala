@@ -10,6 +10,7 @@ import scala.util.Random
 import com.reactor.kingscross.config.PollingConfig
 import com.fasterxml.jackson.databind.ObjectMapper
 import scala.collection.mutable.ArrayBuffer
+import com.fasterxml.jackson.databind.JsonNode
 
 abstract class Emitter(config:PollingConfig) extends Actor with ActorLogging {
 
@@ -19,8 +20,7 @@ abstract class Emitter(config:PollingConfig) extends Actor with ActorLogging {
     // Keys Seen
     var keysSeen = ArrayBuffer[String]()
     val maxBufferSize = 100
-    
-    val mapper = new ObjectMapper()
+  
     
     // Tick Timer
   	implicit val ec = context.dispatcher
@@ -34,11 +34,11 @@ abstract class Emitter(config:PollingConfig) extends Actor with ActorLogging {
 	def handleEvent()
     
     // publish event to bus
-    def publish(event:String, key:String) {
+    def publish(event:JsonNode, key:String) {
     	if (keysSeen.contains(key)) return
     	
-    	val json = mapper.readTree(event)
-    	mediator ! Publish(write_platform, EmitEvent(json))
+
+    	mediator ! Publish(write_platform, EmitEvent(event))
     	
     	keysSeen += key
     	

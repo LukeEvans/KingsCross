@@ -70,6 +70,8 @@ libraryDependencies += "com.indeed" % "java-dogstatsd-client" % "2.0.7"
 
 libraryDependencies += "org.mongodb" %% "casbah" % "2.6.3"
 
+libraryDependencies += "net.java.dev.rome" % "rome" % "1.0.0"
+
 libraryDependencies += "com.tinkerpop.rexster" % "rexster-protocol" % "2.3.0" excludeAll(
         ExclusionRule(organization = "javax.jms"),
         ExclusionRule(organization = "com.sun.jdmk"),

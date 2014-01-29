@@ -25,6 +25,9 @@ class PollingConfig() extends Config {
 
 class NewsConfig() extends PollingConfig {
   
+  var source_id:String = "default_id"
+  var source_url:String = "default_url"
+  
   def this(id:String, url:String, emitPlatform:String="/news", collectPlatform:String = "/news", storePlatform:String = "/news", pollTime:Int) {
 	 this()
 	 
@@ -35,6 +38,9 @@ class NewsConfig() extends PollingConfig {
 	 
 	 start_delay = Random.nextInt % 5
 	 poll_time = pollTime
+	 
+	 source_id = id
+	 source_url = url
   }
 }
 
