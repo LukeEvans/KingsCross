@@ -19,6 +19,7 @@ class NewsBootstrap extends Actor with ActorLogging {
  
   // Init
   storers()
+  collector()
   general()
   custom()
   
@@ -39,6 +40,16 @@ class NewsBootstrap extends Actor with ActorLogging {
 	  // Titan
 	  val titanFlowConfig = FlowControlConfig(name="newsMongoStorer", actorType="com.reactor.kingscross.news.NewsTitanStorer")
 	  val titanStorer = FlowControlFactory.flowControlledActorFor(context, titanFlowConfig, StorerArgs(config=storersConfig, storeType="News"))      
+  }
+  
+  //================================================================================
+  // Standard news collector
+  //================================================================================
+  def collector() {
+	  // Collector
+	  val flowConfig = FlowControlConfig(name="newsCollector", actorType="com.reactor.kingscross.news.NewsCollector")
+	  val collectorConfig = new Config(collectPlatform="/news", storePlatform="/news")
+	  val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=collectorConfig))    
   }
   
   //================================================================================
