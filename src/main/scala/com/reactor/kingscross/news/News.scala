@@ -24,10 +24,13 @@ import java.util.Date;
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.JsonNode
 
-class News(config:PollingConfig) extends Actor {
+class News(config:NewsConfig) extends Actor {
 
   // Emitter
   val emmitter = context.actorOf(Props(classOf[NewsEmitter], config))
+  // Collector
+	  val flowConfig = FlowControlConfig(name="newsCollector", actorType="com.reactor.kingscross.news.NewsCollector")
+	  val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config))  
   
   // Ignore messages
   def receive = { case _ => }    
@@ -87,11 +90,12 @@ class NewsEmitter(config:NewsConfig) extends Emitter(config) {
          
          //	Create a json node out of entryMap and publish
          val mapper = new ObjectMapper()
-         val entryNode:JsonNode = mapper.valueToTree(entryMap);
-         publish(event=entryNode, key=config.source_id + entryMap("title"))
+         val entryNode:JsonNode = mapper.valueToTree(entryMap.asJava);
+         println("Publishing " + entryNode.toString())
+         publish(event=entryNode, key=config.source_id + entryMap("entry_title"))
        }
      } catch {
-       case e:Exception => println("Exception when fetching rss for " + config.source_id)
+       case e:Exception => e.printStackTrace;
      }	  
   }  
 }
@@ -106,7 +110,10 @@ class NewsCollector(args:CollectorArgs) extends Collector(args) {
 	  // Build story
     
 	  println("Collector is collecting");
-    
+	  //var headline = event.data.asInstanceOf[JsonNode].get("entry_title").toString();
+	  println("Create story for " + event.data.asInstanceOf[JsonNode].toString());
+	  
+	  
 	  // Publish the news story object as json
 	  // Publish story json
 	  // publish(event=storyNode)
