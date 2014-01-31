@@ -19,6 +19,10 @@ import java.net.URI
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import org.apache.commons.lang3.StringEscapeUtils
+import java.awt.Image
+import javax.swing.ImageIcon
+import java.net.URISyntaxException
+import java.net.MalformedURLException
 
 object Tools {
   
@@ -138,6 +142,12 @@ object Tools {
                   }
                 }
      }
+    
+    def getImageFromURL(url:String):Image = new ImageIcon(parseUrl(url)).getImage()
+   
+
+    
+	
     
         //================================================================================
         // URL encoding Methods
