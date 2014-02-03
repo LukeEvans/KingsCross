@@ -5,6 +5,10 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
 import java.awt.Image
 import org.apache.commons.lang.StringEscapeUtils
+import com.gravity.goose.Configuration
+import com.gravity.goose.Goose
+import com.gravity.goose.Article
+import com.gravity.goose.Article
 
 class Abstraction {
   
@@ -22,8 +26,44 @@ class Abstractor {
   var baseDifbotURL:String = "http://www.diffbot.com/api/article?token=2a418fe6ffbba74cd24d03a0b2825ea5&url="
   
   def getGooseAbstraction(url:String):Abstraction = {
-    var data = new Abstraction()
-    return data
+    
+    try {
+      
+      val config = new Configuration()
+      config.enableImageFetching_$eq(false)
+      val goose = new Goose(config)
+     
+      try{
+			val article:Article = goose.extractContent(url);
+			if (article == null) {
+			  println("Null article from Goose " + url)
+			  return null
+			}
+			
+			if (article.title == null || article.title.equals("")) {
+			  println("No article title from Goose " + url)
+			  return null
+			}
+			
+			val gooseResult:Abstraction = new Abstraction()
+			gooseResult.title = clean(article.title)
+			gooseResult.text = clean(article.cleanedArticleText)
+			gooseResult.url = article.finalUrl
+			
+			//	Get Entities for Abstraction
+			//	TODO create extractor on actor init
+			val extractor = new EntityExtractor()
+			gooseResult.entities = extractor.getEntitiesFromAlchemy(gooseResult.text)
+			
+			return gooseResult 
+
+		} catch {
+		  case e:Exception => e.printStackTrace()
+		}     
+    } catch {
+      case e:Exception => e.printStackTrace()
+    }
+    return null
   }
   
   def getDifbotAbstraction(url:String):Abstraction = {
@@ -32,10 +72,8 @@ class Abstractor {
       //	Call diffbot and create an Abstraction object
       val difbotResult = Tools.fetchURL(baseDifbotURL + url)
       var data = new Abstraction()
-      data.title = difbotResult.asInstanceOf[JsonNode].path("title").asText()
-      data.title = clean(data.title)
-      data.text = difbotResult.asInstanceOf[JsonNode].path("text").asText()
-      data.text = clean(data.text)
+      data.title = clean(difbotResult.asInstanceOf[JsonNode].path("title").asText())
+      data.text = clean(difbotResult.asInstanceOf[JsonNode].path("text").asText())
       data.url = difbotResult.asInstanceOf[JsonNode].path("url").asText()
       data = getImages(difbotResult,data)
 		

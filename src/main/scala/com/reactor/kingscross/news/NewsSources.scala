@@ -40,7 +40,7 @@ class AtlanticNewsCollector(args:CollectorArgs) extends NewsCollector(args:Colle
 	  //	TODO: Check Initial Validity of story before continuing (move to super class?)
 	  
 	  //	Build article abstraction - this gets entire text and image URLs
-	  
+	  var difbotAbstraction = abstractWithDifbot(story.link)
 	  
 	  
 	  
