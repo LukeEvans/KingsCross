@@ -14,6 +14,12 @@ import com.reactor.kingscross.news.NewsCollector
 import com.reactor.kingscross.news.NewsStory
 import akka.actor.ActorLogging
 import com.reactor.kingscross.news.TopicSet
+import com.reactor.kingscross.news.NewsChannel
+import com.mongodb.DBCollection
+import com.mongodb.casbah.MongoDB
+import com.mongodb.casbah.commons.MongoDBObject
+import com.mongodb.DBObject
+import com.mongodb.casbah.MongoCollection
 
 //================================================================================
 // 	The Atlantic
@@ -31,6 +37,10 @@ class AtlanticNewsCollector(args:CollectorArgs) extends NewsCollector(args:Colle
  
   var isDevChannel = true
   
+  def storyStory(story:NewsStory, data:MongoDBObject) {
+    
+  }
+  
   override def handleEvent(event:EmitEvent) {
 
     println("Atlantic Collecter creating story")
@@ -39,16 +49,87 @@ class AtlanticNewsCollector(args:CollectorArgs) extends NewsCollector(args:Colle
 	val story:NewsStory = parseEventData(event.data)
 	story.source_id = "atlantic"
 	    
-    //	TODO: Load these parameters in from Mongo
-	story.source_name = "The Atlantic"
-	story.source_category = "Culture"
-	story.ceiling_topic = "all_topics"
-	
 	  
-	//	TODO: Get Source Icon
-	//	TODO: Get Twitter Handle
-	    
-	    
+	//	TODO: Make a Mongo call only once a day - load data in an init method?
+    //	TODO: Load parameters from Mongo
+	story.ceiling_topic = "all_topics"
+
+	val channelCollection:MongoCollection = new MongoCollection(winstonDB.right.get.getCollection("winston-channels"))
+	val query = MongoDBObject("db" -> story.source_id)
+	val result = channelCollection.findOne(query) match {
+      case Some(x:DBObject) => {
+        val channel = new MongoDBObject(x)
+        val iconLink = channel.getAs[String]("img") match {
+          case Some(link:String) => story.source_icon_link = link
+          case None => {
+            //	Story is invalid, stop execution
+            println("Story is invalid, no source link found")
+            complete()
+            return
+          }
+        }
+        val sourceName = channel.getAs[String]("name") match {
+          case Some(name:String) => story.source_name = name
+          case None => {
+            //	Story is invalid, stop execution
+            println("Story is invalid, no source name found")
+            complete()
+            return
+          }
+        }
+        val sourceCategory = channel.getAs[String]("category") match {
+          case Some(s:String) => story.source_category = s
+          case None => println("WARNING: Category channel field missing for Atlantic")
+        }
+        val twitterHandle = channel.getAs[String]("twitter_handle") match {
+          case Some(s:String) => story.source_twitter_handle = s
+          case None => println("WARNING: twitter handle channel field missing for Atlantic")
+        }
+      }
+      case None => {
+        //	Check for channel from dev channel list
+        val channelCollection:MongoCollection = new MongoCollection(winstonDB.right.get.getCollection("winston-channels-development"))
+	    val query = MongoDBObject("db" -> story.source_id)
+	    val result = channelCollection.findOne(query) match {
+          case Some(x:DBObject) => {
+            val channel = new MongoDBObject(x)
+            val iconLink = channel.getAs[String]("img") match {
+              case Some(link:String) => story.source_icon_link = link
+              case None => {
+                //	Story is invalid, stop execution
+                println("Story is invalid, no source link found")
+                complete()
+                return
+              }
+            }
+            val sourceName = channel.getAs[String]("name") match {
+              case Some(name:String) => story.source_name = name
+              case None => {
+                //	Story is invalid, stop execution
+                println("Story is invalid, no source name found")
+                complete()
+                return
+              }
+            }
+            val sourceCategory = channel.getAs[String]("category") match {
+              case Some(s:String) => story.source_category = s
+              case None => println("WARNING: Category channel field missing for Atlantic")
+            }
+            val twitterHandle = channel.getAs[String]("twitter_handle") match {
+              case Some(s:String) => story.source_twitter_handle = s
+              case None => println("WARNING: twitter handle channel field missing for Atlantic")
+            }
+          }
+          case None => {
+            println("ERROR: channel entry for Atlantic not found")
+            complete()
+            return
+          }
+        }
+      }
+    }
+
+    
 	//	Add Categories as entities
 	val categories:JsonNode = event.data.path("categories")
 	if (categories!= null) {

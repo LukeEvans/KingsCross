@@ -30,6 +30,19 @@ import akka.actor.Props
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.mongodb.casbah.MongoURI
+import com.mongodb.casbah.MongoDB
+
+
+class NewsChannel {
+  var name:String = null
+  var spoken:String = null
+  var tagline:String = null
+  var db:String = null
+  var img:String = null
+  var twitter_handle:String = null
+  var category:String = null
+}
 
 class News(config:NewsConfig) extends Actor {
 
@@ -124,6 +137,9 @@ class NewsEmitter(config:NewsConfig) extends Emitter(config) {
 // Collect News
 class NewsCollector(args:CollectorArgs) extends Collector(args) {
   
+  val uri = MongoURI("mongodb://levans002:dakota1@ds031887.mongolab.com:31887/winston-db")
+  val winstonDB = uri.connectDB
+  
   def handleEvent(event:EmitEvent) {
     //	Each news source overrides this method  
   }
@@ -209,7 +225,11 @@ class NewsMongoStorer(args:StorerArgs) extends MongoStore(args) {
    
   def handleEvent(event:CollectEvent) {
     
+    //	TODO - make sure the story is not a duplicate
+    
+    
     insert(event.data)
+    println("\nMongo Storer SAVE STORY\n")
 	complete()  	
     
     // Take event.data (NewsStory object stored as json) and store it in Mongo
