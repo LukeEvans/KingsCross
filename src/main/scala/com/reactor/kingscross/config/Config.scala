@@ -20,7 +20,7 @@ class Config {
 
 class PollingConfig() extends Config {
   var start_delay:Int = 1
-  var poll_time:Int = 1
+  var poll_time:Int = 1000
 }
 
 class NewsConfig() extends PollingConfig {

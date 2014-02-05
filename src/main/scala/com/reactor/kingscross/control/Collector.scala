@@ -24,7 +24,7 @@ abstract class Collector(args:CollectorArgs) extends FlowControlActor(args) {
   val mediator = DistributedPubSubExtension(context.system).mediator
 
   val read_platform = config.collect_platform
-  val write_platform = config.store_platform
+  var write_platform = config.store_platform
 
   mediator ! Subscribe(read_platform, master)
   

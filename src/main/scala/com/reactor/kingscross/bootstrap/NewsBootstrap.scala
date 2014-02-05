@@ -5,15 +5,14 @@ import akka.actor.ActorLogging
 import akka.actor.Props
 import com.reactor.kingscross.news.News
 import com.reactor.kingscross.config.NewsConfig
-import com.reactor.kingscross.news.custom.Techcrunch
 import com.reactor.kingscross.config.Config
 import com.reactor.base.patterns.pull.FlowControlFactory
 import com.reactor.base.patterns.pull.FlowControlConfig
 import com.reactor.base.patterns.pull.FlowControlArgs
 import com.reactor.base.patterns.pull.FlowControlConfig
 import com.reactor.kingscross.control.CollectorArgs
-import com.reactor.kingscross.config.NewsConfig
 import com.reactor.kingscross.control.StorerArgs
+import com.reactor.kingscross.news.sources.AtlanticNews
 
 class NewsBootstrap extends Actor with ActorLogging {
  
@@ -32,6 +31,10 @@ class NewsBootstrap extends Actor with ActorLogging {
 	  // Mongo
 	  val mongoFlowConfig = FlowControlConfig(name="newsMongoStorer", actorType="com.reactor.kingscross.news.NewsMongoStorer")
 	  val mongoStorer = FlowControlFactory.flowControlledActorFor(context, mongoFlowConfig, StorerArgs(config=storersConfig, storeType="News"))
+	  
+	  val devStorersConfig = new Config(emitPlatform="/news/dev", collectPlatform="/news/dev", storePlatform="/news/dev")
+	  val devMongoFlowConfig = FlowControlConfig(name="devNewsMongoStorer", actorType="com.reactor.kingscross.news.NewsMongoStorer")
+	  val devMongoStorer = FlowControlFactory.flowControlledActorFor(context, devMongoFlowConfig, StorerArgs(config=devStorersConfig, storeType="News-Dev"))
 	  
 	  // Elasticsearch
 	  val esFlowConfig = FlowControlConfig(name="newsMongoStorer", actorType="com.reactor.kingscross.news.NewsESStorer")
@@ -56,7 +59,7 @@ class NewsBootstrap extends Actor with ActorLogging {
   // General news 
   //================================================================================
   def general() {
-    val atlantic = context.actorOf(Props(classOf[News], new NewsConfig(id="atlantic",url="http://feeds.feedburner.com/TheAtlantic?format=xml",pollTime=10)))
+    val atlantic = context.actorOf(Props(classOf[AtlanticNews], new NewsConfig(id="atlantic",url="http://feeds.feedburner.com/TheAtlantic?format=xml",emitPlatform="/news/atlantic",collectPlatform="/news/atlantic",pollTime=100)))
     //val bbc = context.actorOf(Props(classOf[News], new NewsConfig(id="bbc-health", url="www.bbc-health.com", pollTime=1)))
   }
   

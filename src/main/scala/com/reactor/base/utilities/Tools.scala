@@ -23,6 +23,11 @@ import java.awt.Image
 import javax.swing.ImageIcon
 import java.net.URISyntaxException
 import java.net.MalformedURLException
+import org.apache.http.client.methods.HttpPost
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.entity.StringEntity
+
+import org.apache.http.HttpResponse;
 
 object Tools {
   
@@ -119,12 +124,35 @@ object Tools {
     }
     return md5
   }
+  
+  def postJSON(url:String, body:Object):JsonNode = {
+    
+    try {
+      val httpClient:DefaultHttpClient = new DefaultHttpClient()
+      val postRequest:HttpPost = new HttpPost(url)
+      val mapper:ObjectMapper = new ObjectMapper()
+      var jsonString:String = mapper.writeValueAsString(body)
+      val input:StringEntity = new StringEntity(jsonString)
+      
+      input.setContentType("application/json")
+      postRequest.setEntity(input)
+      val response:HttpResponse = httpClient.execute(postRequest)
+      
+      val reader:BufferedReader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"))
+      var json:String = reader.readLine
+      return mapper.readTree(json)
+      
+    } catch {
+      case e:Exception =>e.printStackTrace
+    }    
+    return null
+  }
 
     def fetchURL(url:String):JsonNode = {
         try {
                 var httpClient = new DefaultHttpClient();
                 httpClient.getParams().setParameter("http.socket.timeout", new Integer(20000));
-                        var getRequest = new HttpGet(parseUrl(url).toString());
+                var getRequest = new HttpGet(parseUrl(url).toString());
                         getRequest.addHeader("accept", "application/json");
 
                         var response = httpClient.execute(getRequest);
@@ -136,8 +164,34 @@ object Tools {
 
                 } catch{
                   case e:Exception =>{
-                        System.out.println("Failure: " + url);
+                	  	var subURL:String = url.substring(0,100)
+                        System.out.println("\nERROR: HTTP Exception at " + subURL +"\n");
                         e.printStackTrace();
+                        return null;
+                  }
+                }
+     }
+    
+    def fetchAlchemyURL(url:String):JsonNode = {
+        try {
+                var httpClient = new DefaultHttpClient();
+                httpClient.getParams().setParameter("http.socket.timeout", new Integer(20000));
+                var postRequest = new HttpPost(parseUrl(url).toString)
+                postRequest.addHeader("accept", "application/json")
+                postRequest.addHeader("Content-Type","application/x-www-form-urlencoded")
+
+                        var response = httpClient.execute(postRequest);
+
+                        // Return JSON
+                        var mapper = new ObjectMapper();
+                        var reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
+                        return mapper.readTree(reader);
+
+                } catch{
+                  case e:Exception =>{
+                        println("\nERROR: Alchemy Exception");
+                        e.printStackTrace();
+                        println("\n")
                         return null;
                   }
                 }
@@ -185,3 +239,28 @@ object Tools {
 		return output;
 	}
 }
+
+class TextPost {
+  var text:String = null
+  
+  def this(s:String) {
+    this()
+    text = s
+  }
+}
+
+class HeadlineTextPost {
+  var headline:String = null
+  var text:String = null
+  
+  def this(h:String, t:String) {
+    this()
+    headline = h
+    text = t
+  } 
+}
+
+
+
+
+

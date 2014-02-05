@@ -15,6 +15,7 @@ abstract class MongoStore(args:StorerArgs) extends Storer(args) {
 
   args.storeType match {
     case "News" => collection = "reactor-news"
+    case "News-Dev" => collection = "reactor-news-dev"
     case "Twitter" => collection = "reactor-tweets"
   }
   

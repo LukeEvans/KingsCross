@@ -9,6 +9,7 @@ import com.gravity.goose.Configuration
 import com.gravity.goose.Goose
 import com.gravity.goose.Article
 import com.gravity.goose.Article
+import com.fasterxml.jackson.databind.ObjectMapper
 
 class Abstraction {
   
@@ -69,17 +70,25 @@ class Abstractor {
   def getDifbotAbstraction(url:String):Abstraction = {
     
     try {
-      //	Call diffbot and create an Abstraction object
-      val difbotResult = Tools.fetchURL(baseDifbotURL + url)
+      //	Call diffbot and create an Abstraction object      
+      val difbotResult:JsonNode = Tools.fetchURL(baseDifbotURL + url)
+      
+      /*val mapper:ObjectMapper = new ObjectMapper()
+      println("\nDiffbot Result:")
+      println(mapper.writeValueAsString(difbotResult)+\n")*/
+      
+      
       var data = new Abstraction()
-      data.title = clean(difbotResult.asInstanceOf[JsonNode].path("title").asText())
-      data.text = clean(difbotResult.asInstanceOf[JsonNode].path("text").asText())
-      data.url = difbotResult.asInstanceOf[JsonNode].path("url").asText()
+      data.title = clean(difbotResult.path("title").asText())
+      data.text = clean(difbotResult.path("text").asText())
+      data.url = difbotResult.path("url").asText()
       data = getImages(difbotResult,data)
 		
       //	Get Entities for Abstraction
       //	TODO create extractor on actor init
       val extractor = new EntityExtractor()
+      
+      
       data.entities = extractor.getEntitiesFromAlchemy(data.text)
       
       return data

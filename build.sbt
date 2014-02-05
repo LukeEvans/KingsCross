@@ -74,6 +74,10 @@ libraryDependencies += "net.java.dev.rome" % "rome" % "1.0.0"
 
 libraryDependencies += "com.gravity" % "goose" % "2.1.22"
 
+libraryDependencies += "org.springframework.data" % "spring-data-mongodb" % "1.0.4.RELEASE"
+
+
+
 libraryDependencies += "com.tinkerpop.rexster" % "rexster-protocol" % "2.3.0" excludeAll(
         ExclusionRule(organization = "javax.jms"),
         ExclusionRule(organization = "com.sun.jdmk"),

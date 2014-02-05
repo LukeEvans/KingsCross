@@ -2,13 +2,10 @@ package com.reactor.kingscross.news
 
 import java.net.URL
 import java.util.Date
-
 import scala.collection.JavaConverters.asScalaBufferConverter
 import scala.collection.JavaConverters.mapAsJavaMapConverter
 import scala.util.control.Breaks
-
 import org.apache.commons.lang.StringEscapeUtils
-
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.reactor.base.patterns.pull.FlowControlConfig
@@ -28,17 +25,19 @@ import com.sun.syndication.feed.synd.SyndContent
 import com.sun.syndication.feed.synd.SyndEntry
 import com.sun.syndication.io.SyndFeedInput
 import com.sun.syndication.io.XmlReader
-
 import akka.actor.Actor
 import akka.actor.Props
+import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import com.fasterxml.jackson.databind.DeserializationFeature
 
 class News(config:NewsConfig) extends Actor {
 
   // Emitter
   val emmitter = context.actorOf(Props(classOf[NewsEmitter], config))
   // Collector
-	  val flowConfig = FlowControlConfig(name="newsCollector", actorType="com.reactor.kingscross.news.NewsCollector")
-	  val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config))  
+  val flowConfig = FlowControlConfig(name="newsCollector", actorType="com.reactor.kingscross.news.NewsCollector")
+  val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config))  
   
   // Ignore messages
   def receive = { case _ => }    
@@ -64,14 +63,14 @@ class NewsEmitter(config:NewsConfig) extends Emitter(config) {
        loop.breakable {
          for (entry <- feed.getEntries().asScala) {
            // Publish each story as JsonNode representation RSS object
-           println("New Story found for " + config.source_id);
+           //println("New Story found for " + config.source_id);
            var entryMap:Map[String, Object] = Map()
            entryMap += ("entry_title" -> entry.asInstanceOf[SyndEntry].getTitle())
          
            if (entry.asInstanceOf[SyndEntry].getPublishedDate() == null) {
              entryMap += ("entry_pubdate" -> new Date().toString())
            } else {
-        	 entryMap += ("entry_pubdate" -> entry.asInstanceOf[SyndEntry].getPublishedDate().toString())
+        	 entryMap += ("entry_pubdate" -> entry.asInstanceOf[SyndEntry].getPublishedDate().toString())  
            }
          
            entryMap += ("entry_url" -> entry.asInstanceOf[SyndEntry].getLink())
@@ -107,7 +106,7 @@ class NewsEmitter(config:NewsConfig) extends Emitter(config) {
            val entryNode:JsonNode = mapper.valueToTree(entryMap.asJava);
          
          
-           println("Publishing " + entryNode.toString())
+           //println("Publishing " + entryNode.toString())
            publish(event=entryNode, key=config.source_id + entryMap("entry_title"))
            entriesPublished += 1
            if(entriesPublished >= entryLimit) {
@@ -126,15 +125,7 @@ class NewsEmitter(config:NewsConfig) extends Emitter(config) {
 class NewsCollector(args:CollectorArgs) extends Collector(args) {
   
   def handleEvent(event:EmitEvent) {
-    
-    //	Each news source overrides this method
-	 
-	  // Publish the news story object as json
-	  // Publish story json
-	  // publish(event=storyNode)
-    
-      // Completed event
-      //complete()
+    //	Each news source overrides this method  
   }
   
   def parseEventData(data:JsonNode):NewsStory = {
@@ -142,13 +133,11 @@ class NewsCollector(args:CollectorArgs) extends Collector(args) {
     // Take event.data JsonNode built by Emitter and build a NewsStory object
 	  val story = new NewsStory()
 	  story.story_type = "News"
-	  var title:String = data.get("entry_title").toString()
+	  var title:String = data.get("entry_title").asText()
 	  story.headline = StringEscapeUtils.unescapeHtml(title)
-	  story.pubdate = data.get("entry_pubdate").toString()
-	  story.link = data.get("entry_url").toString()
-	  story.author = data.get("entry_author").toString()
-	  story.extractedText = data.get("entry_text").toString()
-	 
+	  story.pubdate = data.get("entry_pubdate").asText()
+	  story.link = data.get("entry_url").asText()
+	  story.author = data.get("entry_author").asText()
     
     return story
   }
@@ -163,6 +152,56 @@ class NewsCollector(args:CollectorArgs) extends Collector(args) {
     return abstractor.getGooseAbstraction(url)
   }
   
+  def getSummary(headline:String, fullText:String):String = {
+   
+    if (fullText == null | fullText.equals("")) {
+      println("Full text not found, can't summarize")
+      return null
+    }
+    
+    val summarizor = new Summarizor()
+    var summary:String = summarizor.getSummary(headline,fullText)
+    
+    if (summary != null && !summary.equals("")) {
+      return summary
+    }
+    else {
+      return summarizor.firstTwoSentencesSummary(fullText)
+    }
+  }
+  
+  def scrubSpeech(speech:String):String = {
+    val scrubber:Scrubber = new Scrubber()
+    return scrubber.scrubSpeechEvent(speech)
+  }
+  
+  def scrubFullText(text:String):String = {
+    val scrubber:Scrubber = new Scrubber()
+    return scrubber.scrubFullText(text)
+  }
+  
+  def getTopics(story:NewsStory):TopicSet = {
+    val topicExtractor = new TopicExtractor()
+    return topicExtractor.extractTopicsFromStory(story)
+  }
+  
+  def publishStory(story:NewsStory,isDev:Boolean) {
+    // Publish the news story object as json
+    if (isDev) {
+      write_platform += "/dev"
+    }
+    
+    val mapper = new ObjectMapper() with ScalaObjectMapper
+    mapper.registerModule(DefaultScalaModule)
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    
+    val json:JsonNode = mapper.valueToTree(story)
+    
+    println("\nPublishing story from " + story.source_id + " headline:\n" + story.headline + "\n")
+    
+    publish(json)  
+  }
+  
 }
 
 // Mongo
@@ -170,14 +209,16 @@ class NewsMongoStorer(args:StorerArgs) extends MongoStore(args) {
    
   def handleEvent(event:CollectEvent) {
     
-	  	// Take event.data (NewsStory object stored as json) and store it in Mongo
-	  	// insert(story)
-	  	
-	  	// Publish event.data complete message (Optional)
-	  	// publish(event.data)
+    insert(event.data)
+	complete()  	
     
-      	// Completed event      	
-      	complete()
+    // Take event.data (NewsStory object stored as json) and store it in Mongo
+	// insert(story)
+	  	
+	// Publish event.data complete message (Optional)
+	// publish(event.data)
+       	
+    
   }   
 }
 

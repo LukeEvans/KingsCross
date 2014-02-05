@@ -3,6 +3,7 @@ package com.reactor.kingscross.news
 import com.reactor.base.utilities.Tools
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
+import com.fasterxml.jackson.databind.ObjectMapper
 
 class EntityExtractor {
   
@@ -11,10 +12,22 @@ class EntityExtractor {
   
   
   def getEntitiesFromAlchemy(text:String):Set[Entity] =  {
-    var alchemyURL = alchemyBaseURL + "?apikey=" + alchemyAPIKey + "&outputMode=json" + "&sentiment=1" + "&text" + text
-    var alchemyResult:JsonNode = Tools.fetchURL(alchemyURL)
+    
+    if (text == null || text.equals("")) {
+      println("ERROR, no text to send to Alchemy")
+      return Set()
+    }
+    
+    var alchemyURL = alchemyBaseURL + "?apikey=" + alchemyAPIKey + "&outputMode=json" + "&sentiment=1" + "&text=" + text
+    var alchemyResult:JsonNode = Tools.fetchAlchemyURL(alchemyURL)
+    
+    if(alchemyResult == null) {
+      println("Bad Alchemy Reslult")
+      return Set()
+    }
+    
+    
     if (alchemyResult.path("status").asText().equalsIgnoreCase("ok")) {
-      println("Alchemy Recieved")
       var a = 0
       if (alchemyResult.path("entities").isArray()) {
         var entities:JsonNode = alchemyResult.get("entities")
@@ -32,6 +45,9 @@ class EntityExtractor {
     }
     else {
       println("Bad alchemy result, status = "+alchemyResult.path("status").asText())
+      val mapper:ObjectMapper = new ObjectMapper()
+      var error:String = mapper.writeValueAsString(alchemyResult)
+      println(error)
     }
     
     
