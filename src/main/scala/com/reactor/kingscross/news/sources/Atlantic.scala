@@ -1,7 +1,6 @@
 package com.reactor.kingscross.news.sources
 
-import com.reactor.kingscross.control.CollectorArgs
-import com.reactor.kingscross.control.EmitEvent
+import com.reactor.kingscross.control.{StorerArgs, CollectorArgs, EmitEvent}
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.JsonNode
 import com.reactor.kingscross.config.NewsConfig
@@ -12,11 +11,7 @@ import com.reactor.kingscross.news.Entity
 import com.reactor.kingscross.news.News
 import com.reactor.kingscross.news.NewsCollector
 import com.reactor.kingscross.news.NewsStory
-import akka.actor.ActorLogging
 import com.reactor.kingscross.news.TopicSet
-import com.reactor.kingscross.news.NewsChannel
-import com.mongodb.DBCollection
-import com.mongodb.casbah.MongoDB
 import com.mongodb.casbah.commons.MongoDBObject
 import com.mongodb.DBObject
 import com.mongodb.casbah.MongoCollection
@@ -30,163 +25,163 @@ class AtlanticNews(config:NewsConfig)  extends News(config:NewsConfig) {
 	// Collector
 	override val flowConfig = FlowControlConfig(name="atlanticCollector", actorType="com.reactor.kingscross.news.sources.AtlanticNewsCollector")
 	override val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
+
 }
   
   
 class AtlanticNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
- 
-  var isDevChannel = true
-  
-  def storyStory(story:NewsStory, data:MongoDBObject) {
-    
-  }
-  
+
+  var isDevChannel:Boolean = false
+
   override def handleEvent(event:EmitEvent) {
 
-    println("Atlantic Collecter creating story")
+    println("\nAtlantic Collecter creating story\n")
     
     //	Fill out preliminary News Story fields
-	val story:NewsStory = parseEventData(event.data)
-	story.source_id = "atlantic"
+	  val story:NewsStory = parseEventData(event.data)
+	  story.source_id = "atlantic"
 	    
 	  
-	//	TODO: Make a Mongo call only once a day - load data in an init method?
+	  //	TODO: Make a Mongo call only once a day - load data in an init method?
     //	TODO: Load parameters from Mongo
-	story.ceiling_topic = "all_topics"
+	  story.ceiling_topic = "all_topics"
 
-	val channelCollection:MongoCollection = new MongoCollection(winstonDB.right.get.getCollection("winston-channels"))
-	val query = MongoDBObject("db" -> story.source_id)
-	val result = channelCollection.findOne(query) match {
-      case Some(x:DBObject) => {
+	  val channelCollection:MongoCollection = new MongoCollection(winstonDB.right.get.getCollection("winston-channels"))
+	  val query = MongoDBObject("db" -> story.source_id)
+	  channelCollection.findOne(query) match {
+      case Some(x:DBObject) =>
         val channel = new MongoDBObject(x)
-        val iconLink = channel.getAs[String]("img") match {
+        channel.getAs[String]("img") match {
           case Some(link:String) => story.source_icon_link = link
-          case None => {
+          case None =>
             //	Story is invalid, stop execution
             println("Story is invalid, no source link found")
             complete()
             return
-          }
         }
-        val sourceName = channel.getAs[String]("name") match {
+
+
+        channel.getAs[String]("name") match {
           case Some(name:String) => story.source_name = name
-          case None => {
+          case None =>
             //	Story is invalid, stop execution
             println("Story is invalid, no source name found")
             complete()
             return
-          }
         }
-        val sourceCategory = channel.getAs[String]("category") match {
+
+        channel.getAs[String]("category") match {
           case Some(s:String) => story.source_category = s
           case None => println("WARNING: Category channel field missing for Atlantic")
         }
-        val twitterHandle = channel.getAs[String]("twitter_handle") match {
+
+        channel.getAs[String]("twitter_handle") match {
           case Some(s:String) => story.source_twitter_handle = s
           case None => println("WARNING: twitter handle channel field missing for Atlantic")
         }
-      }
-      case None => {
+
+      case None =>
         //	Check for channel from dev channel list
         val channelCollection:MongoCollection = new MongoCollection(winstonDB.right.get.getCollection("winston-channels-development"))
-	    val query = MongoDBObject("db" -> story.source_id)
-	    val result = channelCollection.findOne(query) match {
-          case Some(x:DBObject) => {
+	      val query = MongoDBObject("db" -> story.source_id)
+
+        channelCollection.findOne(query) match {
+          case Some(x:DBObject) =>
             val channel = new MongoDBObject(x)
-            val iconLink = channel.getAs[String]("img") match {
+            channel.getAs[String]("img") match {
               case Some(link:String) => story.source_icon_link = link
-              case None => {
+              case None =>
                 //	Story is invalid, stop execution
                 println("Story is invalid, no source link found")
                 complete()
                 return
-              }
             }
-            val sourceName = channel.getAs[String]("name") match {
+
+            channel.getAs[String]("name") match {
               case Some(name:String) => story.source_name = name
-              case None => {
+              case None =>
                 //	Story is invalid, stop execution
                 println("Story is invalid, no source name found")
                 complete()
                 return
-              }
             }
-            val sourceCategory = channel.getAs[String]("category") match {
+            channel.getAs[String]("category") match {
               case Some(s:String) => story.source_category = s
               case None => println("WARNING: Category channel field missing for Atlantic")
             }
-            val twitterHandle = channel.getAs[String]("twitter_handle") match {
+            channel.getAs[String]("twitter_handle") match {
               case Some(s:String) => story.source_twitter_handle = s
               case None => println("WARNING: twitter handle channel field missing for Atlantic")
             }
-          }
-          case None => {
+
+          case None =>
             println("ERROR: channel entry for Atlantic not found")
             complete()
             return
-          }
+
         }
-      }
     }
 
     
-	//	Add Categories as entities
-	val categories:JsonNode = event.data.path("categories")
-	if (categories!= null) {
-	  if (categories.asInstanceOf[JsonNode].isArray()) {
-	    var a = 0
-	    for( a <- 0 until categories.asInstanceOf[ArrayNode].size()) {
-	      var category:String = categories.asInstanceOf[ArrayNode].get(a).toString()
-	      if (shouldAddEntity(category)) {
-	        var entity = new Entity(category)
-            story.entities + entity
+	  //	Add Categories as entities
+	  val categories:JsonNode = event.data.path("categories")
+	  if (categories!= null) {
+	    if (categories.asInstanceOf[JsonNode].isArray) {
+	      for( a <- 0 until categories.asInstanceOf[ArrayNode].size()) {
+	        val category:String = categories.asInstanceOf[ArrayNode].get(a).toString
+	        if (shouldAddEntity(category)) {
+	          val entity = new Entity(category)
+             story.entities += entity
+	        }
 	      }
 	    }
 	  }
-	}
 	  
 	  
-	//	TODO: Check Initial Validity of story before continuing (move to super class?)
+	  //	TODO: Check Initial Validity of story before continuing (move to super class?)
 	  
-	//	Build article abstraction - this gets entire text and image URLs
-	var difbotAbstraction:Abstraction = abstractWithDifbot(story.link)
-	
-	//	Handle Images (custom to each news source)
-	if (difbotAbstraction.primary_images.size > 0) {
-	  story.image_links = difbotAbstraction.primary_images
-	} 
-	else {
-	  story.image_links = difbotAbstraction.secondary_images
-	}
-	
-	story.parseAbstraction(difbotAbstraction)
-   	story.speech = story.buildSpeech  
-	
-	story.summary = getSummary(story.headline,story.full_text)
-	story.speech = story.summary // TODO lots going on with speech field, can we simplify?
+	  //	Build article abstraction - this gets entire text and image URLs
+	  abstractWithDifbot(story.link)  match {
+      case None =>
+        println("COLLECTOR ERROR - Story creation failed at extraction creation for Atlantic")
+        complete()
+        return
+      case Some(difbotAbstraction:Abstraction) =>
+        //	Handle Images (custom to each news source)
+        if (difbotAbstraction.primary_images.size > 0) {
+          story.image_links = difbotAbstraction.primary_images
+        }
+        else {
+          story.image_links = difbotAbstraction.secondary_images
+        }
 
-	story.speech = scrubSpeech(story.speech)
-	story.full_text = scrubFullText(story.full_text)
-	
-	//	Topic Extraction
-	val extractedTopics:TopicSet = getTopics(story)
-	story.related_topics = extractedTopics.relatedTopics
-	story.main_topics = extractedTopics.mainTopics
-	
-	story.valid = story.checkValid()
-	
-	publishStory(story, isDevChannel)
-	
-	// Completed Event
-	complete()
-	
+        //println(story.image_links.size + " images links added to story\n")
+
+        story.parseAbstraction(difbotAbstraction)
+        story.speech = story.buildSpeech()
+
+        story.summary = getSummary(story.headline,story.full_text)
+        story.speech = story.summary // TODO lots going on with speech field, can we simplify?
+
+        story.speech = scrubSpeech(story.speech)
+        story.full_text = scrubFullText(story.full_text)
+
+        //	Topic Extraction
+        val extractedTopics:TopicSet = getTopics(story)
+        story.related_topics = extractedTopics.relatedTopics
+        story.main_topics = extractedTopics.mainTopics
+
+        story.valid = story.checkValid()
+
+        publishStory(story, isDevChannel)
+
+        // Completed Event
+        complete()
+    }
+
   }
-	
-  def shouldAddEntity(entity:String):Boolean = {
-	  
+
   //	Filter out bad source-specific entities
-  return true
-	  
-  }
+  def shouldAddEntity(entity:String):Boolean = true
 }
 

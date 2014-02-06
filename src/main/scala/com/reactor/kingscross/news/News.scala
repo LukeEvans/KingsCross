@@ -51,14 +51,6 @@ class News(config:NewsConfig) extends Actor {
   val flowConfig = FlowControlConfig(name="newsCollector", actorType="com.reactor.kingscross.news.NewsCollector")
   val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config))
 
-  //  Storer
-  val storersConfig = new Config(emitPlatform="/news", collectPlatform="/news", storePlatform="/news")
-  val mongoFlowConfig = FlowControlConfig(name="newsMongoStorer", actorType="com.reactor.kingscross.news.NewsMongoStorer")
-  val mongoStorer = FlowControlFactory.flowControlledActorFor(context, mongoFlowConfig, StorerArgs(config=storersConfig, storeType="News"))
-
-  val devStorersConfig = new Config(emitPlatform="/news/dev", collectPlatform="/news/dev", storePlatform="/news/dev")
-  val devMongoFlowConfig = FlowControlConfig(name="devNewsMongoStorer", actorType="com.reactor.kingscross.news.NewsMongoStorer")
-  val devMongoStorer = FlowControlFactory.flowControlledActorFor(context, devMongoFlowConfig, StorerArgs(config=devStorersConfig, storeType="News-Dev"))
   
   // Ignore messages
   def receive = { case _ => }    
@@ -100,7 +92,7 @@ class NewsEmitter(config:NewsConfig) extends Emitter(config) {
            //	Extract any categories associated with the RSS
            val categories:List[String] = List()
            for (category <- entry.asInstanceOf[SyndEntry].getCategories().asScala) {
-             categories + category.asInstanceOf[SyndCategory].getName()
+             categories += category.asInstanceOf[SyndCategory].getName()
            }
            if (!categories.isEmpty) {
              entryMap += ("categories" -> categories)
@@ -109,7 +101,7 @@ class NewsEmitter(config:NewsConfig) extends Emitter(config) {
            //	Extract any text associated with RSS
            var entry_text:String = ""
            for (content <- entry.asInstanceOf[SyndEntry].getContents().asScala) {
-        	 entry_text = entry_text + content.asInstanceOf[SyndContent].getValue()
+        	 entry_text +=  content.asInstanceOf[SyndContent].getValue()
            }
          
            if (entry_text == "") {
@@ -166,9 +158,12 @@ class NewsCollector(args:CollectorArgs) extends Collector(args) {
     return story
   }
   
-  def abstractWithDifbot(url:String):Abstraction = {
+  def abstractWithDifbot(url:String):Option[Abstraction] = {
     val abstractor = new Abstractor() // TODO: make one object with collector
-    return abstractor.getDifbotAbstraction(url)
+    abstractor.getDifbotAbstraction(url) match {
+      case Some(a:Abstraction) => Some(a)
+      case None => None
+    }
   }
   
   def abstractWithGoose(url:String):Abstraction = {
@@ -184,13 +179,13 @@ class NewsCollector(args:CollectorArgs) extends Collector(args) {
     }
     
     val summarizor = new Summarizor()
-    var summary:String = summarizor.getSummary(headline,fullText)
+    val summary:String = summarizor.getSummary(headline,fullText)
     
     if (summary != null && !summary.equals("")) {
-      return summary
+      summary
     }
     else {
-      return summarizor.firstTwoSentencesSummary(fullText)
+      summarizor.firstTwoSentencesSummary(fullText)
     }
   }
   
@@ -209,12 +204,13 @@ class NewsCollector(args:CollectorArgs) extends Collector(args) {
     return topicExtractor.extractTopicsFromStory(story)
   }
   
-  def publishStory(story:NewsStory,isDev:Boolean) {
+  def publishStory(story:NewsStory, isDev:Boolean) {
     // Publish the news story object as json
+
     if (isDev) {
       write_platform += "/dev"
     }
-    
+
     val mapper = new ObjectMapper() with ScalaObjectMapper
     mapper.registerModule(DefaultScalaModule)
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)

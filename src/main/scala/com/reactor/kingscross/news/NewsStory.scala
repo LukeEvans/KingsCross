@@ -46,6 +46,9 @@ class NewsStory {
     if(full_text != null) {
       full_text = full_text.replaceAll("/n"," ")
     }
+    else {
+      println("\nERROR - No full text found on abstraction\n")     // TODO handle error
+    }
     
     if (abstractData.entities != null && abstractData.entities.size > 0) {
       for (abstractEntity:Entity <- abstractData.entities) {

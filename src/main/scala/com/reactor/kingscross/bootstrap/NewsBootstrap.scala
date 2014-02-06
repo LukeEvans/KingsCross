@@ -32,9 +32,8 @@ class NewsBootstrap extends Actor with ActorLogging {
 	  val mongoFlowConfig = FlowControlConfig(name="newsMongoStorer", actorType="com.reactor.kingscross.news.NewsMongoStorer")
 	  val mongoStorer = FlowControlFactory.flowControlledActorFor(context, mongoFlowConfig, StorerArgs(config=storersConfig, storeType="News"))
 	  
-	  val devStorersConfig = new Config(emitPlatform="/news/dev", collectPlatform="/news/dev", storePlatform="/news/dev")
-	  val devMongoFlowConfig = FlowControlConfig(name="devNewsMongoStorer", actorType="com.reactor.kingscross.news.NewsMongoStorer")
-	  val devMongoStorer = FlowControlFactory.flowControlledActorFor(context, devMongoFlowConfig, StorerArgs(config=devStorersConfig, storeType="News-Dev"))
+	  val devStorersConfig = new Config(emitPlatform="/news/dev", collectPlatform="/news", storePlatform="/news/dev")
+	  val devMongoStorer = FlowControlFactory.flowControlledActorFor(context, mongoFlowConfig, StorerArgs(config=devStorersConfig, storeType="News-Dev"))
 	  
 	  // Elasticsearch
 	  val esFlowConfig = FlowControlConfig(name="newsMongoStorer", actorType="com.reactor.kingscross.news.NewsESStorer")

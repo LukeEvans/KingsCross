@@ -5,8 +5,6 @@ import com.mongodb.casbah.MongoCollection
 import com.mongodb.casbah.commons.MongoDBObject
 import com.mongodb.DBObject
 
-
-
 class Topic {
   var topic:String = null
   var parent_topic:String = null
@@ -65,13 +63,13 @@ class TopicExtractor {
             //	Match found, add topic as a related topic
             val topicMatch:Topic = new Topic(new MongoDBObject(x))
             if (!extractedTopics.relatedTopics(topicMatch.topic)) {
-              extractedTopics.relatedTopics + topicMatch.topic
+              extractedTopics.relatedTopics += topicMatch.topic
             }
             
             //	Add topic as a main topic if it is contained in the headline or summary
             if(story.headline.toLowerCase().contains(ent.entity_name.toLowerCase()) || story.summary.toLowerCase().contains(ent.entity_name.toLowerCase())) {
               if(!extractedTopics.mainTopics(topicMatch.topic)) {
-                extractedTopics.mainTopics + topicMatch.topic
+                extractedTopics.mainTopics += topicMatch.topic
                 //	Add parent topics of main topics to related topics
                 extractedTopics.relatedTopics = getParentTopics(topicMatch,story.ceiling_topic,extractedTopics.relatedTopics)
               }
@@ -85,12 +83,12 @@ class TopicExtractor {
                 val akaTopic:Topic = new Topic(new MongoDBObject(x))
                 //	Match found, add topic as a related topic
                 if(!extractedTopics.relatedTopics(akaTopic.topic)) {
-                  extractedTopics.relatedTopics + akaTopic.topic
+                  extractedTopics.relatedTopics += akaTopic.topic
             
                   //	Add topic as a main topic if it is contained in the headline or summary
                   if(story.headline.toLowerCase().contains(ent.entity_name.toLowerCase()) || story.summary.toLowerCase().contains(ent.entity_name.toLowerCase())) {
                     if(!extractedTopics.mainTopics(akaTopic.topic)) {
-                      extractedTopics.mainTopics + akaTopic.topic
+                      extractedTopics.mainTopics += akaTopic.topic
                       //	Add parent topics of main topics to related topics
                       extractedTopics.relatedTopics = getParentTopics(akaTopic,story.ceiling_topic,extractedTopics.relatedTopics)
                 }
@@ -128,7 +126,7 @@ class TopicExtractor {
     }
     
     if (extractedTopics.relatedTopics.size == 0) {
-      extractedTopics.relatedTopics + story.ceiling_topic
+      extractedTopics.relatedTopics += story.ceiling_topic
     }
     return extractedTopics
   }
@@ -141,7 +139,7 @@ class TopicExtractor {
       //	See if the topic is the ceiling topic
       if(topic.parent_topic.equals(ceilingTopic)) {
     	  if (!modifiedTopics(ceilingTopic)) {
-    	    modifiedTopics + ceilingTopic
+    	    modifiedTopics += ceilingTopic
     	  }
       }
       else {
@@ -153,7 +151,7 @@ class TopicExtractor {
     	    //	Add to related topics
     	    val parentTopic = new Topic(new MongoDBObject(x))
     	    if (!modifiedTopics(parentTopic.topic)) {
-              modifiedTopics + parentTopic.topic
+              modifiedTopics += parentTopic.topic
               modifiedTopics = getParentTopics(parentTopic,ceilingTopic,modifiedTopics)
             }
     	  }

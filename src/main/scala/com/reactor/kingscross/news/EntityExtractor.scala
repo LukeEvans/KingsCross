@@ -25,7 +25,7 @@ class EntityExtractor {
       return Set()
     }
 
-    println("\nAlchemy Recieved:\n"+alchemyResult.toString+"\n")
+    //println("\nAlchemy Received:\n"+alchemyResult.toString+"\n")
     
     
     if (alchemyResult.path("status").asText().equalsIgnoreCase("ok")) {
@@ -39,7 +39,7 @@ class EntityExtractor {
           entity.entity_type = entityData.path("type").asText()
           entity.entity_name = entityData.path("text").asText()
           entity.sentiment = entityData.path("sentiment").path("type").asText
-          result + entity
+          result += entity
         }
         return result
       }

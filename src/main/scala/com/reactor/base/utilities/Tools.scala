@@ -15,7 +15,7 @@ import java.awt.Image
 import javax.swing.ImageIcon
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.client.ClientProtocolException
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient
 import org.apache.http.entity.StringEntity
 
 import org.apache.http.{NameValuePair, HttpResponse}
@@ -23,6 +23,7 @@ import org.apache.http.message.BasicNameValuePair
 import org.apache.http.client.entity.UrlEncodedFormEntity
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
+import org.apache.commons.io.output.ByteArrayOutputStream
 
 ;
 
@@ -42,19 +43,18 @@ object Tools {
   def addObjectToJson(field:String, obj:Object, json:JsonNode):ObjectNode = {
     try{
       
-      var mapper = new ObjectMapper()
-      var node = json.asInstanceOf[ObjectNode]
+      val mapper = new ObjectMapper()
+      val node = json.asInstanceOf[ObjectNode]
       
-      var jsonNode:JsonNode = mapper.valueToTree(obj)
+      val jsonNode:JsonNode = mapper.valueToTree(obj)
       node.put(field, jsonNode)
       
-      return node
+      node
       
     } catch{
-      case e:Exception => {
+      case e:Exception =>
         e.printStackTrace()
         return null
-      }
     }
   }
   
@@ -140,34 +140,34 @@ object Tools {
       return mapper.readTree(json)
       
     } catch {
-      case e:Exception =>e.printStackTrace
+      case e:Exception =>e.printStackTrace()
     }    
-    return null
+    null // TODO make return type an option
   }
 
-    def fetchURL(url:String):JsonNode = {
-        try {
-                var httpClient = new DefaultHttpClient()
-                httpClient.getParams().setParameter("http.socket.timeout", new Integer(20000))
-                var getRequest = new HttpGet(parseUrl(url).toString())
-                        getRequest.addHeader("accept", "application/json")
+  def fetchURL(url:String):JsonNode = {
+    try {
+      val httpClient = new DefaultHttpClient()
+      httpClient.getParams.setParameter("http.socket.timeout", new Integer(20000))
+      val getRequest = new HttpGet(parseUrl(url).toString)
+      getRequest.addHeader("accept", "application/json")
 
-                        var response = httpClient.execute(getRequest);
+      val response = httpClient.execute(getRequest)
 
-                        // Return JSON
-                        var mapper = new ObjectMapper();
-                        var reader = new BufferedReader(new InputStreamReader(response.getEntity.getContent, "UTF-8"))
-                        return mapper.readTree(reader);
+      // Return JSON
+      val mapper = new ObjectMapper()
+      val reader = new BufferedReader(new InputStreamReader(response.getEntity.getContent, "UTF-8"))
 
-                } catch{
-                  case e:Exception =>{
-                	  	var subURL:String = url.substring(0,100)
-                        System.out.println("\nERROR: HTTP Exception at " + subURL +"\n");
-                        e.printStackTrace();
-                        return null;
-                  }
-                }
+      mapper.readTree(reader)
+
+     } catch {
+       case e:Exception =>
+         val subURL:String = url.substring(0,100)
+         System.out.println("\nERROR: HTTP Exception at " + subURL +"\n")
+         e.printStackTrace()
+         return null
      }
+   }
     
     def fetchAlchemyURL(url:String, text:String):JsonNode = {
         try {
