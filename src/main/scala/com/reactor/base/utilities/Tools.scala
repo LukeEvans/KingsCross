@@ -28,124 +28,124 @@ import org.apache.commons.io.output.ByteArrayOutputStream
 ;
 
 object Tools {
-  
-  def generateRandomNumber():Int = {
+
+  def generateRandomNumber(): Int = {
     var Min = 0
     var Max = 65535
-    
-    var random:Int = Min + (Math.random() * ((Max - Min)+1)).asInstanceOf[Int]
-    
+
+    var random: Int = Min + (Math.random() * ((Max - Min) + 1)).asInstanceOf[Int]
+
     random -= 32768
-    
+
     return random
   }
-  
-  def addObjectToJson(field:String, obj:Object, json:JsonNode):ObjectNode = {
-    try{
-      
+
+  def addObjectToJson(field: String, obj: Object, json: JsonNode): ObjectNode = {
+    try {
+
       val mapper = new ObjectMapper()
       val node = json.asInstanceOf[ObjectNode]
-      
-      val jsonNode:JsonNode = mapper.valueToTree(obj)
+
+      val jsonNode: JsonNode = mapper.valueToTree(obj)
       node.put(field, jsonNode)
-      
+
       node
-      
-    } catch{
-      case e:Exception =>
+
+    } catch {
+      case e: Exception =>
         e.printStackTrace()
         return null
     }
   }
-  
-  def jsonFromString(input:String):ObjectNode = {
-    if(input != null && input.length() > 0){
+
+  def jsonFromString(input: String): ObjectNode = {
+    if (input != null && input.length() > 0) {
       var objectMapper = new ObjectMapper()
-      try{
+      try {
         return objectMapper.readValue(input, classOf[ObjectNode])
-      }catch{
-        case e:Exception =>{
+      } catch {
+        case e: Exception => {
           e.printStackTrace()
           return null
         }
       }
     }
-    else{
+    else {
       return null
     }
   }
-  
-  def mergeBodyAndURL(params:java.util.Map[String, String], input:String):JsonNode = {
+
+  def mergeBodyAndURL(params: java.util.Map[String, String], input: String): JsonNode = {
     var tempInput = escapeInput(input)
-    
-    var node:ObjectNode = jsonFromString(tempInput)
-    
-    if(node == null){
+
+    var node: ObjectNode = jsonFromString(tempInput)
+
+    if (node == null) {
       var mapper = new ObjectMapper()
       node = mapper.createObjectNode()
     }
-    
-    
-    for(key <- params.keySet()){
+
+
+    for (key <- params.keySet()) {
       node.put(key, params.get(key))
     }
-    
+
     return node
   }
-  
-  def escapeInput(input:String):String = {
+
+  def escapeInput(input: String): String = {
     return input.replace("\n", "").replace("\r", "")
   }
-  
-  def generateHash(s:String):String = {
+
+  def generateHash(s: String): String = {
     return md5(s.toLowerCase())
   }
-  
-  def md5(input:String):String = {
-    var md5:String = null
-    
-    if(null == input) return null
-    
-    try{
+
+  def md5(input: String): String = {
+    var md5: String = null
+
+    if (null == input) return null
+
+    try {
       var digest = MessageDigest.getInstance("MD5")
-      
+
       digest.update(input.getBytes(), 0, input.length())
-      
+
       md5 = new BigInteger(1, digest.digest()).toString(16)
-      
-    } catch{
-      case e:Exception => {
+
+    } catch {
+      case e: Exception => {
         e.printStackTrace()
         return null
       }
     }
     return md5
   }
-  
-  def postJSON(url:String, body:Object):JsonNode = {
-    
+
+  def postJSON(url: String, body: Object): JsonNode = {
+
     try {
-      val httpClient:DefaultHttpClient = new DefaultHttpClient()
-      val postRequest:HttpPost = new HttpPost(url)
-      val mapper:ObjectMapper = new ObjectMapper()
-      val jsonString:String = mapper.writeValueAsString(body)
-      val input:StringEntity = new StringEntity(jsonString)
-      
+      val httpClient: DefaultHttpClient = new DefaultHttpClient()
+      val postRequest: HttpPost = new HttpPost(url)
+      val mapper: ObjectMapper = new ObjectMapper()
+      val jsonString: String = mapper.writeValueAsString(body)
+      val input: StringEntity = new StringEntity(jsonString)
+
       input.setContentType("application/json")
       postRequest.setEntity(input)
-      val response:HttpResponse = httpClient.execute(postRequest)
-      
-      val reader:BufferedReader = new BufferedReader(new InputStreamReader(response.getEntity.getContent, "UTF-8"))
-      val json:String = reader.readLine
+      val response: HttpResponse = httpClient.execute(postRequest)
+
+      val reader: BufferedReader = new BufferedReader(new InputStreamReader(response.getEntity.getContent, "UTF-8"))
+      val json: String = reader.readLine
       return mapper.readTree(json)
-      
+
     } catch {
-      case e:Exception =>e.printStackTrace()
-    }    
+      case e: Exception => e.printStackTrace()
+    }
     null // TODO make return type an option
   }
 
-  def fetchURL(url:String):JsonNode = {
+  def fetchURL(url: String): JsonNode = {
     try {
       val httpClient = new DefaultHttpClient()
       httpClient.getParams.setParameter("http.socket.timeout", new Integer(20000))
@@ -160,111 +160,108 @@ object Tools {
 
       mapper.readTree(reader)
 
-     } catch {
-       case e:Exception =>
-         val subURL:String = url.substring(0,100)
-         System.out.println("\nERROR: HTTP Exception at " + subURL +"\n")
-         e.printStackTrace()
-         return null
-     }
-   }
-    
-    def fetchAlchemyURL(url:String, text:String):JsonNode = {
-        try {
-                val httpClient = new DefaultHttpClient()
-                httpClient.getParams.setParameter("http.socket.timeout", new Integer(20000))
+    } catch {
+      case e: Exception =>
+        val subURL: String = url.substring(0, 100)
+        System.out.println("\nERROR: HTTP Exception at " + subURL + "\n")
+        e.printStackTrace()
+        return null
+    }
+  }
 
-                val postRequest = new HttpPost(parseUrl(url).toString)
-                postRequest.addHeader("Content-Type","application/x-www-form-urlencoded")
+  def fetchAlchemyURL(url: String, text: String): JsonNode = {
+    try {
+      val httpClient = new DefaultHttpClient()
+      httpClient.getParams.setParameter("http.socket.timeout", new Integer(20000))
 
-                val postData = new ListBuffer[NameValuePair]
-                postData += new BasicNameValuePair("text",text)
-                val postBody:UrlEncodedFormEntity = new  UrlEncodedFormEntity(postData)
-                postRequest.setEntity(postBody)
-                        val response = httpClient.execute(postRequest)
+      val postRequest = new HttpPost(parseUrl(url).toString)
+      postRequest.addHeader("Content-Type", "application/x-www-form-urlencoded")
 
-                        // Return JSON
-                        val mapper = new ObjectMapper()
-                        val reader = new BufferedReader(new InputStreamReader(response.getEntity.getContent, "UTF-8"))
-                        mapper.readTree(reader)
+      val postData = new ListBuffer[NameValuePair]
+      postData += new BasicNameValuePair("text", text)
+      val postBody: UrlEncodedFormEntity = new UrlEncodedFormEntity(postData)
+      postRequest.setEntity(postBody)
+      val response = httpClient.execute(postRequest)
 
-                } catch {
-                  case e:ClientProtocolException => {
-                    println("\n"+url+"\n")
-                    println("\nERROR: Alchemy Exception, Reason - " + e.toString)
-                    e.printStackTrace()
-                    return null
-                  }
-                  case e:Exception => {
-                        println("\nERROR: Alchemy Exception")
-                        e.printStackTrace()
-                        println("\n")
-                        return null
-                  }
-                }
-     }
-    
-    def getImageFromURL(url:String):Image = new ImageIcon(parseUrl(url)).getImage
-   
+      // Return JSON
+      val mapper = new ObjectMapper()
+      val reader = new BufferedReader(new InputStreamReader(response.getEntity.getContent, "UTF-8"))
+      mapper.readTree(reader)
 
-    
-	
-    
-        //================================================================================
-        // URL encoding Methods
-        //================================================================================
-        def parseUrl(s:String):URL = {
-                var u:URL = null;
-                try {
-                        u = new URL(s);
-                        try {
-                                return new URI(
-                                                u.getProtocol(), 
-                                                u.getAuthority(), 
-                                                u.getPath(),
-                                                u.getQuery(), 
-                                                u.getRef()).toURL();
-                        } catch {                  
-                                  case e:Exception=> {
-                                          e.printStackTrace();
-                        
-                                  }
-                        }
-                } 
-                return null;
+    } catch {
+      case e: ClientProtocolException => {
+        println("\n" + url + "\n")
+        println("\nERROR: Alchemy Exception, Reason - " + e.toString)
+        e.printStackTrace()
+        return null
+      }
+      case e: Exception => {
+        println("\nERROR: Alchemy Exception")
+        e.printStackTrace()
+        println("\n")
+        return null
+      }
+    }
+  }
+
+  def getImageFromURL(url: String): Image = new ImageIcon(parseUrl(url)).getImage
+
+
+  //================================================================================
+  // URL encoding Methods
+  //================================================================================
+  def parseUrl(s: String): URL = {
+    var u: URL = null;
+    try {
+      u = new URL(s);
+      try {
+        return new URI(
+          u.getProtocol(),
+          u.getAuthority(),
+          u.getPath(),
+          u.getQuery(),
+          u.getRef()).toURL();
+      } catch {
+        case e: Exception => {
+          e.printStackTrace();
+
         }
-        
-  	def decodeCharacters(input:String):String = {
-		var output = StringEscapeUtils.escapeHtml4(input);
-		output = output.replaceAll("&rdquo;", "&quot;");
-		output = output.replaceAll("&ldquo;", "&quot;");
-		output = output.replaceAll("&lsquo;", "'");
-		output = output.replaceAll("&rsquo;", "'");
-		output = output.replaceAll("&mdash;", "-");
-		output = StringEscapeUtils.unescapeHtml4(output);
-		
-		return output;
-	}
+      }
+    }
+    return null;
+  }
+
+  def decodeCharacters(input: String): String = {
+    var output = StringEscapeUtils.escapeHtml4(input);
+    output = output.replaceAll("&rdquo;", "&quot;");
+    output = output.replaceAll("&ldquo;", "&quot;");
+    output = output.replaceAll("&lsquo;", "'");
+    output = output.replaceAll("&rsquo;", "'");
+    output = output.replaceAll("&mdash;", "-");
+    output = StringEscapeUtils.unescapeHtml4(output);
+
+    return output;
+  }
 }
 
 class TextPost {
-  var text:String = null
-  
-  def this(s:String) {
+  var text: String = null
+
+  def this(s: String) {
     this()
     text = s
   }
 }
 
 class HeadlineTextPost {
-  var headline:String = null
-  var text:String = null
-  
-  def this(h:String, t:String) {
+  var headline: String = null
+  var text: String = null
+
+  def this(h: String, t: String) {
     this()
     headline = h
     text = t
-  } 
+  }
 }
 
 

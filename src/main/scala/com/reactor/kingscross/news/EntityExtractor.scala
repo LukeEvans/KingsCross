@@ -32,7 +32,7 @@ class EntityExtractor {
       var a = 0
       if (alchemyResult.path("entities").isArray()) {
         val entities:JsonNode = alchemyResult.get("entities")
-        val result:Set[Entity] = Set()
+        var result:Set[Entity] = Set()
         for (a <- 0 until entities.size()) {
           val entityData = entities.get(a)
           val entity:Entity = new Entity()

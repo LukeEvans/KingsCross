@@ -31,7 +31,7 @@ class AtlanticNews(config:NewsConfig)  extends News(config:NewsConfig) {
   
 class AtlanticNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
 
-  var isDevChannel:Boolean = false
+  var isDevChannel:Boolean = true
 
   override def handleEvent(event:EmitEvent) {
 

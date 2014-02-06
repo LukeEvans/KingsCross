@@ -90,9 +90,9 @@ class NewsEmitter(config:NewsConfig) extends Emitter(config) {
            entryMap += ("entry_author" -> entry.asInstanceOf[SyndEntry].getAuthor())
          
            //	Extract any categories associated with the RSS
-           val categories:List[String] = List()
+           var categories:Set[String] = Set()
            for (category <- entry.asInstanceOf[SyndEntry].getCategories().asScala) {
-             categories += category.asInstanceOf[SyndCategory].getName()
+             categories += category.asInstanceOf[SyndCategory].getName
            }
            if (!categories.isEmpty) {
              entryMap += ("categories" -> categories)
@@ -217,7 +217,7 @@ class NewsCollector(args:CollectorArgs) extends Collector(args) {
     
     val json:JsonNode = mapper.valueToTree(story)
     
-    println("\nPublishing story from " + story.source_id + " headline:\n" + story.headline + "\n")
+    println("\nPublishing story to " + write_platform + " from " + story.source_id + " headline:\n" + story.headline + "\n")
     
     publish(json)  
   }
