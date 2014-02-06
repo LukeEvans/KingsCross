@@ -2,7 +2,6 @@ package com.reactor.kingscross.news
 
 import com.reactor.base.utilities.Tools
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.ObjectMapper
 
 class EntityExtractor {
@@ -17,24 +16,26 @@ class EntityExtractor {
       println("ERROR, no text to send to Alchemy")
       return Set()
     }
-    
-    var alchemyURL = alchemyBaseURL + "?apikey=" + alchemyAPIKey + "&outputMode=json" + "&sentiment=1" + "&text=" + text
-    var alchemyResult:JsonNode = Tools.fetchAlchemyURL(alchemyURL)
+
+    val alchemyURL = alchemyBaseURL + "?apikey=" + alchemyAPIKey + "&outputMode=json" + "&sentiment=1"
+    val alchemyResult:JsonNode = Tools.fetchAlchemyURL(alchemyURL, text)
     
     if(alchemyResult == null) {
-      println("Bad Alchemy Reslult")
+      println("Bad Alchemy Result")
       return Set()
     }
+
+    println("\nAlchemy Recieved:\n"+alchemyResult.toString+"\n")
     
     
     if (alchemyResult.path("status").asText().equalsIgnoreCase("ok")) {
       var a = 0
       if (alchemyResult.path("entities").isArray()) {
-        var entities:JsonNode = alchemyResult.get("entities")
+        val entities:JsonNode = alchemyResult.get("entities")
         val result:Set[Entity] = Set()
         for (a <- 0 until entities.size()) {
-          var entityData = entities.get(a)
-          var entity:Entity = new Entity()
+          val entityData = entities.get(a)
+          val entity:Entity = new Entity()
           entity.entity_type = entityData.path("type").asText()
           entity.entity_name = entityData.path("text").asText()
           entity.sentiment = entityData.path("sentiment").path("type").asText
@@ -46,11 +47,9 @@ class EntityExtractor {
     else {
       println("Bad alchemy result, status = "+alchemyResult.path("status").asText())
       val mapper:ObjectMapper = new ObjectMapper()
-      var error:String = mapper.writeValueAsString(alchemyResult)
+      val error:String = mapper.writeValueAsString(alchemyResult)
       println(error)
     }
-    
-    
-    return null
+    null
   }
 }

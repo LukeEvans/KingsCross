@@ -2,18 +2,10 @@ package com.reactor.base.utilities
 
 import java.math.BigInteger
 import java.security.MessageDigest
-import java.util.HashMap
-import java.net.URL
-import java.net.URI
-import java.io.InputStreamReader
-import scala.collection.JavaConversions._
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
-import edu.stanford.nlp.trees.Tree
-import java.util.ArrayList
 import org.apache.http.client.methods.HttpGet
-import org.apache.http.impl.client.DefaultHttpClient
 import java.net.URL
 import java.net.URI
 import java.io.BufferedReader
@@ -21,13 +13,18 @@ import java.io.InputStreamReader
 import org.apache.commons.lang3.StringEscapeUtils
 import java.awt.Image
 import javax.swing.ImageIcon
-import java.net.URISyntaxException
-import java.net.MalformedURLException
 import org.apache.http.client.methods.HttpPost
+import org.apache.http.client.ClientProtocolException
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.entity.StringEntity
 
-import org.apache.http.HttpResponse;
+import org.apache.http.{NameValuePair, HttpResponse}
+import org.apache.http.message.BasicNameValuePair
+import org.apache.http.client.entity.UrlEncodedFormEntity
+import scala.collection.JavaConversions._
+import scala.collection.mutable.ListBuffer
+
+;
 
 object Tools {
   
@@ -131,15 +128,15 @@ object Tools {
       val httpClient:DefaultHttpClient = new DefaultHttpClient()
       val postRequest:HttpPost = new HttpPost(url)
       val mapper:ObjectMapper = new ObjectMapper()
-      var jsonString:String = mapper.writeValueAsString(body)
+      val jsonString:String = mapper.writeValueAsString(body)
       val input:StringEntity = new StringEntity(jsonString)
       
       input.setContentType("application/json")
       postRequest.setEntity(input)
       val response:HttpResponse = httpClient.execute(postRequest)
       
-      val reader:BufferedReader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"))
-      var json:String = reader.readLine
+      val reader:BufferedReader = new BufferedReader(new InputStreamReader(response.getEntity.getContent, "UTF-8"))
+      val json:String = reader.readLine
       return mapper.readTree(json)
       
     } catch {
@@ -150,16 +147,16 @@ object Tools {
 
     def fetchURL(url:String):JsonNode = {
         try {
-                var httpClient = new DefaultHttpClient();
-                httpClient.getParams().setParameter("http.socket.timeout", new Integer(20000));
-                var getRequest = new HttpGet(parseUrl(url).toString());
-                        getRequest.addHeader("accept", "application/json");
+                var httpClient = new DefaultHttpClient()
+                httpClient.getParams().setParameter("http.socket.timeout", new Integer(20000))
+                var getRequest = new HttpGet(parseUrl(url).toString())
+                        getRequest.addHeader("accept", "application/json")
 
                         var response = httpClient.execute(getRequest);
 
                         // Return JSON
                         var mapper = new ObjectMapper();
-                        var reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
+                        var reader = new BufferedReader(new InputStreamReader(response.getEntity.getContent, "UTF-8"))
                         return mapper.readTree(reader);
 
                 } catch{
@@ -172,32 +169,42 @@ object Tools {
                 }
      }
     
-    def fetchAlchemyURL(url:String):JsonNode = {
+    def fetchAlchemyURL(url:String, text:String):JsonNode = {
         try {
-                var httpClient = new DefaultHttpClient();
-                httpClient.getParams().setParameter("http.socket.timeout", new Integer(20000));
-                var postRequest = new HttpPost(parseUrl(url).toString)
-                postRequest.addHeader("accept", "application/json")
+                val httpClient = new DefaultHttpClient()
+                httpClient.getParams.setParameter("http.socket.timeout", new Integer(20000))
+
+                val postRequest = new HttpPost(parseUrl(url).toString)
                 postRequest.addHeader("Content-Type","application/x-www-form-urlencoded")
 
-                        var response = httpClient.execute(postRequest);
+                val postData = new ListBuffer[NameValuePair]
+                postData += new BasicNameValuePair("text",text)
+                val postBody:UrlEncodedFormEntity = new  UrlEncodedFormEntity(postData)
+                postRequest.setEntity(postBody)
+                        val response = httpClient.execute(postRequest)
 
                         // Return JSON
-                        var mapper = new ObjectMapper();
-                        var reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
-                        return mapper.readTree(reader);
+                        val mapper = new ObjectMapper()
+                        val reader = new BufferedReader(new InputStreamReader(response.getEntity.getContent, "UTF-8"))
+                        mapper.readTree(reader)
 
-                } catch{
-                  case e:Exception =>{
-                        println("\nERROR: Alchemy Exception");
-                        e.printStackTrace();
+                } catch {
+                  case e:ClientProtocolException => {
+                    println("\n"+url+"\n")
+                    println("\nERROR: Alchemy Exception, Reason - " + e.toString)
+                    e.printStackTrace()
+                    return null
+                  }
+                  case e:Exception => {
+                        println("\nERROR: Alchemy Exception")
+                        e.printStackTrace()
                         println("\n")
-                        return null;
+                        return null
                   }
                 }
      }
     
-    def getImageFromURL(url:String):Image = new ImageIcon(parseUrl(url)).getImage()
+    def getImageFromURL(url:String):Image = new ImageIcon(parseUrl(url)).getImage
    
 
     

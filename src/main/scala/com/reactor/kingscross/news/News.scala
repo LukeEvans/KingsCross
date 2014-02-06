@@ -31,7 +31,6 @@ import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.mongodb.casbah.MongoURI
-import com.mongodb.casbah.MongoDB
 
 
 class NewsChannel {
@@ -47,7 +46,7 @@ class NewsChannel {
 class News(config:NewsConfig) extends Actor {
 
   // Emitter
-  val emmitter = context.actorOf(Props(classOf[NewsEmitter], config))
+  val emitter = context.actorOf(Props(classOf[NewsEmitter], config))
   // Collector
   val flowConfig = FlowControlConfig(name="newsCollector", actorType="com.reactor.kingscross.news.NewsCollector")
   val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config))  
@@ -60,7 +59,7 @@ class News(config:NewsConfig) extends Actor {
 class NewsEmitter(config:NewsConfig) extends Emitter(config) {
   
   
-  def handleEvent() {
+   def handleEvent() {
      println("News emitter handle event for " + config.source_id + " from url " + config.source_url); 
     
      // Fetch RSS
@@ -69,9 +68,9 @@ class NewsEmitter(config:NewsConfig) extends Emitter(config) {
        val reader = new XmlReader(url)
        val feed = new SyndFeedInput().build(reader);
        
-       var entryLimit = 20	// Defines how many entries will be published
+       val entryLimit = 20	// Defines how many entries will be published
        var entriesPublished = 0
-       
+
        val loop = new Breaks
        loop.breakable {
          for (entry <- feed.getEntries().asScala) {
@@ -90,7 +89,7 @@ class NewsEmitter(config:NewsConfig) extends Emitter(config) {
            entryMap += ("entry_author" -> entry.asInstanceOf[SyndEntry].getAuthor())
          
            //	Extract any categories associated with the RSS
-           var categories:List[String] = List()
+           val categories:List[String] = List()
            for (category <- entry.asInstanceOf[SyndEntry].getCategories().asScala) {
              categories + category.asInstanceOf[SyndCategory].getName()
            }
