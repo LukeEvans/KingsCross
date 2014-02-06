@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="SBT: org.glassfish.grizzly:grizzly-framework:2.2.16">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.glassfish.grizzly/grizzly-framework/jars/grizzly-framework-2.2.16.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.glassfish.grizzly/grizzly-framework/docs/grizzly-framework-2.2.16-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.glassfish.grizzly/grizzly-framework/srcs/grizzly-framework-2.2.16-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

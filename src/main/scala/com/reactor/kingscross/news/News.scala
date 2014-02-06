@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.reactor.base.patterns.pull.FlowControlConfig
 import com.reactor.base.patterns.pull.FlowControlFactory
-import com.reactor.kingscross.config.NewsConfig
+import com.reactor.kingscross.config.{Config, NewsConfig}
 import com.reactor.kingscross.control.CollectEvent
 import com.reactor.kingscross.control.Collector
 import com.reactor.kingscross.control.CollectorArgs
@@ -49,7 +49,16 @@ class News(config:NewsConfig) extends Actor {
   val emitter = context.actorOf(Props(classOf[NewsEmitter], config))
   // Collector
   val flowConfig = FlowControlConfig(name="newsCollector", actorType="com.reactor.kingscross.news.NewsCollector")
-  val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config))  
+  val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config))
+
+  //  Storer
+  val storersConfig = new Config(emitPlatform="/news", collectPlatform="/news", storePlatform="/news")
+  val mongoFlowConfig = FlowControlConfig(name="newsMongoStorer", actorType="com.reactor.kingscross.news.NewsMongoStorer")
+  val mongoStorer = FlowControlFactory.flowControlledActorFor(context, mongoFlowConfig, StorerArgs(config=storersConfig, storeType="News"))
+
+  val devStorersConfig = new Config(emitPlatform="/news/dev", collectPlatform="/news/dev", storePlatform="/news/dev")
+  val devMongoFlowConfig = FlowControlConfig(name="devNewsMongoStorer", actorType="com.reactor.kingscross.news.NewsMongoStorer")
+  val devMongoStorer = FlowControlFactory.flowControlledActorFor(context, devMongoFlowConfig, StorerArgs(config=devStorersConfig, storeType="News-Dev"))
   
   // Ignore messages
   def receive = { case _ => }    
@@ -225,11 +234,10 @@ class NewsMongoStorer(args:StorerArgs) extends MongoStore(args) {
   def handleEvent(event:CollectEvent) {
     
     //	TODO - make sure the story is not a duplicate
-    
-    
+
     insert(event.data)
     println("\nMongo Storer SAVE STORY\n")
-	complete()  	
+	  complete()
     
     // Take event.data (NewsStory object stored as json) and store it in Mongo
 	// insert(story)
