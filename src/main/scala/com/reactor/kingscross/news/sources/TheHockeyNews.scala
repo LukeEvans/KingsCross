@@ -19,21 +19,21 @@ import com.mongodb.casbah.MongoCollection
 import akka.actor.Props
 
 //================================================================================
-// 	NHL
-//  Notes: -  Abstract with Difbot
+// 	The Hockey News
+//  Notes: - abstract with Difbot
 //================================================================================
 
-class NhlNews(config:NewsConfig)  extends News(config:NewsConfig) {
+class TheHockeyNewsNews(config:NewsConfig)  extends News(config:NewsConfig) {
   //Emitter
   val emitter = context.actorOf(Props(classOf[NewsEmitter], config))
   // Collector
-	val flowConfig = FlowControlConfig(name="nhlCollector", actorType="com.reactor.kingscross.news.sources.NhlNewsCollector")
+	val flowConfig = FlowControlConfig(name="theHockeyNewsCollector", actorType="com.reactor.kingscross.news.sources.TheHockeyNewsNewsCollector")
 	val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
 
 }
 
 
-class NhlNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
+class TheHockeyNewsNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
 
   var isDevChannel:Boolean = false
 
@@ -41,7 +41,7 @@ class NhlNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorA
 
     //	Fill out preliminary News Story fields
 	  val story:NewsStory = parseEventData(event.data)
-	  story.source_id = "nhlfeatured"
+	  story.source_id = "thehockeynews"
 	    
 	  
 	  //	TODO: Make a Mongo call only once a day - load data in an init method?

@@ -20,7 +20,8 @@ import akka.actor.Props
 
 //================================================================================
 // 	CNN Politics
-//  Notes: - this channel has many Difbot timeouts - these stories are only videos
+//  Notes - this channel has many Difbot timeouts - these stories are only videos
+//        - abstracts with Difbot
 //================================================================================
 
 class CNNPoliticsNews(config:NewsConfig)  extends News(config:NewsConfig) {

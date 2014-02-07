@@ -65,7 +65,10 @@ class NewsBootstrap extends Actor with ActorLogging {
     //val wsj = context.actorOf(Props(classOf[WallStreetJournalNews], new NewsConfig(id="wsj",url="http://online.wsj.com/xml/rss/3_7014.xml",emitPlatform="/news/wsj",collectPlatform="/news/wsj",pollTime=5000)))
     //val cnnPolitics = context.actorOf(Props(classOf[CNNPoliticsNews], new NewsConfig(id="cnn_politics",url="http://rss.cnn.com/rss/cnn_allpolitics.rss",emitPlatform="/news/cnn_politics",collectPlatform="/news/cnn_politics",pollTime=5000)))
     //val yahooSportsNhl = context.actorOf(Props(classOf[YahooSportsNhlNews], new NewsConfig(id="yahoosports_nhl",url="http://sports.yahoo.com/nhl/rss.xml",emitPlatform="/news/yahoosports_nhl",collectPlatform = "/news/yahoosports_nhl",pollTime = 5000)))
-    val nhl = context.actorOf(Props(classOf[NhlNews], new NewsConfig(id="nhlfeatured",url="http://www.nhl.com/rss/features.xml",emitPlatform = "/news/nhlfeatured",collectPlatform = "/news/nhlfeatured",pollTime = 5000)))
+    //val nhl = context.actorOf(Props(classOf[NhlNews], new NewsConfig(id="nhlfeatured",url="http://www.nhl.com/rss/features.xml",emitPlatform = "/news/nhlfeatured",collectPlatform = "/news/nhlfeatured",pollTime = 5000)))
+
+    val theHockeyNewsId:String = "thehockeynews"
+    val theHockeyNews = context.actorOf(Props(classOf[TheHockeyNewsNews], new NewsConfig(id=theHockeyNewsId,url="http://thehockeynews.com.feedsportal.com/c/34166/f/621201/index.rss",emitPlatform = "/news/"+theHockeyNewsId,collectPlatform = "/news/"+theHockeyNewsId,pollTime = 5000)))
 
     //val bbc = context.actorOf(Props(classOf[News], new NewsConfig(id="bbc-health", url="www.bbc-health.com", pollTime=1)))
   }

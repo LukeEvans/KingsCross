@@ -20,6 +20,7 @@ import akka.actor.Props
 
 //================================================================================
 // 	Yahoo Sports - NHL RSS Feed
+//  Notes:  - abstract with Difbot
 //================================================================================
 
 class YahooSportsNhlNews(config:NewsConfig)  extends News(config:NewsConfig) {

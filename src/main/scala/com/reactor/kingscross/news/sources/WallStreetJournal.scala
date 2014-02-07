@@ -20,6 +20,7 @@ import akka.actor.Props
 
 //================================================================================
 // 	The Wall Street Journal  - U.S. Business RSS Feed
+//  Notes:  - abstract with Difbot
 //================================================================================
 
 class WallStreetJournalNews(config:NewsConfig)  extends News(config:NewsConfig) {
