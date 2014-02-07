@@ -2,14 +2,14 @@ package com.reactor.kingscross.news
 
 import com.mongodb.casbah.MongoURI
 import com.mongodb.casbah.MongoCollection
-import com.mongodb.casbah.commons.MongoDBObject
-import com.mongodb.DBObject
+import com.mongodb.casbah.commons.{MongoDBList, MongoDBObject}
+import com.mongodb.{BasicDBList, DBObject}
 
 class Topic {
   var topic:String = null
   var parent_topic:String = null
-  var child_topics:Set[String] = Set()
-  var akas:Set[String] = Set()
+  var child_topics:List[Any] = List()
+  var akas:List[Any] = List()
   
   def this(dbEntry:MongoDBObject) {
     this()
@@ -21,12 +21,12 @@ class Topic {
       case Some(s:String) => this.parent_topic = s
       case None =>
     }
-    val childTopics = dbEntry.getAs[Set[String]]("child_topics") match {
-      case Some(s:Set[String]) => this.child_topics = s
+    val childTopics = dbEntry.getAs[MongoDBList]("child_topics") match {
+      case Some(s:MongoDBList) => this.child_topics = s.toList
       case None =>
     }
-    val akaData = dbEntry.getAs[Set[String]]("akas") match {
-      case Some(s:Set[String]) => this.akas = s
+    val akaData = dbEntry.getAs[MongoDBList]("akas") match {
+      case Some(s:MongoDBList) => this.akas = s.toList
       case None =>
     }
   }
@@ -146,7 +146,7 @@ class TopicExtractor {
       }
       else {
         //	Find parent topic from Mongo
-    	val topicCollection = new MongoCollection(winstonDB.right.get.getCollection("news-topic-tree"))
+    	val topicCollection = new MongoCollection(winstonDB.right.get.getCollection("news_topic_tree"))
     	val query = MongoDBObject("topic" -> topic.parent_topic)
     	val dbResult = topicCollection.findOne(query) match {
     	  case Some(x:DBObject) => {

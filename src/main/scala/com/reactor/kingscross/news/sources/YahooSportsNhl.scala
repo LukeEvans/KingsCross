@@ -19,21 +19,20 @@ import com.mongodb.casbah.MongoCollection
 import akka.actor.Props
 
 //================================================================================
-// 	CNN Politics
-//  Notes: - this channel has many Difbot timeouts - these stories are only videos
+// 	Yahoo Sports - NHL RSS Feed
 //================================================================================
 
-class CNNPoliticsNews(config:NewsConfig)  extends News(config:NewsConfig) {
+class YahooSportsNhlNews(config:NewsConfig)  extends News(config:NewsConfig) {
   //Emitter
   val emitter = context.actorOf(Props(classOf[NewsEmitter], config))
   // Collector
-	val flowConfig = FlowControlConfig(name="cnnPoliticsCollector", actorType="com.reactor.kingscross.news.sources.CNNPoliticsNewsCollector")
+	val flowConfig = FlowControlConfig(name="yahooSportsNhlCollector", actorType="com.reactor.kingscross.news.sources.YahooSportsNhlNewsCollector")
 	val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
 
 }
 
 
-class CNNPoliticsNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
+class YahooSportsNhlNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
 
   var isDevChannel:Boolean = false
 
@@ -41,12 +40,12 @@ class CNNPoliticsNewsCollector(args:CollectorArgs) extends NewsCollector(args:Co
 
     //	Fill out preliminary News Story fields
 	  val story:NewsStory = parseEventData(event.data)
-	  story.source_id = "cnn_politics"
+	  story.source_id = "yahoosports_nhl"
 	    
 	  
 	  //	TODO: Make a Mongo call only once a day - load data in an init method?
     //	TODO: Load parameters from Mongo
-	  story.ceiling_topic = "politics"
+	  story.ceiling_topic = "nhl"
 
 	  val channelCollection:MongoCollection = new MongoCollection(winstonDB.right.get.getCollection("winston-channels"))
 	  val query = MongoDBObject("db" -> story.source_id)
@@ -74,7 +73,7 @@ class CNNPoliticsNewsCollector(args:CollectorArgs) extends NewsCollector(args:Co
 
         channel.getAs[String]("category") match {
           case Some(s:String) => story.source_category = s
-          case None => println("WARNING: Category channel field missing for "+story.source_id)
+          case None => println("WARNING: Category channel field missing for " + story.source_id)
         }
 
         channel.getAs[String]("twitter_handle") match {
@@ -145,24 +144,11 @@ class CNNPoliticsNewsCollector(args:CollectorArgs) extends NewsCollector(args:Co
 	  //	Build article abstraction - this gets entire text and image URLs
 	  abstractWithDifbot(story.link)  match {
       case None =>
-        println("COLLECTOR ERROR - Difbot abstraction failed at extraction creation for " + story.source_id + " for url " + story.link)
+        println("COLLECTOR ERROR - Story creation failed at extraction creation for "+story.source_id)
         complete()
         return
       case Some(difbotAbstraction:Abstraction) =>
         //	Handle Images (custom to each news source)
-
-        //  Remove no flash player image
-        for (link:String <- difbotAbstraction.primary_images) {
-          if (link.contains("_no_flash")) {
-            difbotAbstraction.primary_images -= link
-          }
-        }
-        for (link:String <- difbotAbstraction.secondary_images) {
-          if (link.contains("_no_flash")) {
-            difbotAbstraction.secondary_images -= link
-          }
-        }
-
         if (difbotAbstraction.primary_images.size > 0) {
           story.image_links = difbotAbstraction.primary_images
         }

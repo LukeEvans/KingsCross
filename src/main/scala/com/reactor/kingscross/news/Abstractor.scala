@@ -158,7 +158,7 @@ class Abstractor {
 
   
   def isValidImageLink(url:String):Boolean = {
-    if (url.contains(".jpeg") || url.contains(".jpg") || url.contains(".png")) {
+    if (url.contains(".jpeg") || url.contains(".jpg") || url.contains(".png") || url.contains(".yimg")) {
       true
     }
     else {

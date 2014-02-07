@@ -12,7 +12,7 @@ import com.reactor.base.patterns.pull.FlowControlArgs
 import com.reactor.base.patterns.pull.FlowControlConfig
 import com.reactor.kingscross.control.CollectorArgs
 import com.reactor.kingscross.control.StorerArgs
-import com.reactor.kingscross.news.sources.{CNNPoliticsNews, WallStreetJournalNews, AtlanticNews}
+import com.reactor.kingscross.news.sources.{YahooSportsNhlNews, CNNPoliticsNews, WallStreetJournalNews, AtlanticNews}
 
 class NewsBootstrap extends Actor with ActorLogging {
  
@@ -58,9 +58,11 @@ class NewsBootstrap extends Actor with ActorLogging {
   // General news 
   //================================================================================
   def general() {
-    val atlantic = context.actorOf(Props(classOf[AtlanticNews], new NewsConfig(id="atlantic",url="http://feeds.feedburner.com/TheAtlantic?format=xml",emitPlatform="/news/atlantic",collectPlatform="/news/atlantic",pollTime=5000)))
-    val wsj = context.actorOf(Props(classOf[WallStreetJournalNews], new NewsConfig(id="wsj",url="http://online.wsj.com/xml/rss/3_7014.xml",emitPlatform="/news/wsj",collectPlatform="/news/wsj",pollTime=5000)))
-    val cnnPolitics = context.actorOf(Props(classOf[CNNPoliticsNews], new NewsConfig(id="cnn_politics",url="http://rss.cnn.com/rss/cnn_allpolitics.rss",emitPlatform="/news/cnn_politics",collectPlatform="/news/cnn_politics",pollTime=5000)))
+    //val atlantic = context.actorOf(Props(classOf[AtlanticNews], new NewsConfig(id="atlantic",url="http://feeds.feedburner.com/TheAtlantic?format=xml",emitPlatform="/news/atlantic",collectPlatform="/news/atlantic",pollTime=5000)))
+    //val wsj = context.actorOf(Props(classOf[WallStreetJournalNews], new NewsConfig(id="wsj",url="http://online.wsj.com/xml/rss/3_7014.xml",emitPlatform="/news/wsj",collectPlatform="/news/wsj",pollTime=5000)))
+    //val cnnPolitics = context.actorOf(Props(classOf[CNNPoliticsNews], new NewsConfig(id="cnn_politics",url="http://rss.cnn.com/rss/cnn_allpolitics.rss",emitPlatform="/news/cnn_politics",collectPlatform="/news/cnn_politics",pollTime=5000)))
+    val yahooSportsNhl = context.actorOf(Props(classOf[YahooSportsNhlNews], new NewsConfig(id="yahoosports_nhl",url="http://sports.yahoo.com/nhl/rss.xml",emitPlatform="/news/yahoosports_nhl",collectPlatform = "/news/yahoosports_nhl",pollTime = 5000)))
+
 
     //val bbc = context.actorOf(Props(classOf[News], new NewsConfig(id="bbc-health", url="www.bbc-health.com", pollTime=1)))
   }
