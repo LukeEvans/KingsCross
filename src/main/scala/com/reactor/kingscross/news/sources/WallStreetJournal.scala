@@ -19,7 +19,7 @@ import com.mongodb.casbah.MongoCollection
 import akka.actor.Props
 
 //================================================================================
-// 	The Wall Street Journal
+// 	The Wall Street Journal  - U.S. Business RSS Feed
 //================================================================================
 
 class WallStreetJournalNews(config:NewsConfig)  extends News(config:NewsConfig) {

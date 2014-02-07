@@ -59,7 +59,7 @@ class NewsBootstrap extends Actor with ActorLogging {
   //================================================================================
   def general() {
     val atlantic = context.actorOf(Props(classOf[AtlanticNews], new NewsConfig(id="atlantic",url="http://feeds.feedburner.com/TheAtlantic?format=xml",emitPlatform="/news/atlantic",collectPlatform="/news/atlantic",pollTime=5000)))
-    val wsj = context.actorOf(Props(classOf[WallStreetJournalNews], new NewsConfig(id="wsj",url="http://online.wsj.com/xml/rss/3_7011.xml",emitPlatform="/news/wsj",collectPlatform="/news/wsj",pollTime=5000)))
+    val wsj = context.actorOf(Props(classOf[WallStreetJournalNews], new NewsConfig(id="wsj",url="http://online.wsj.com/xml/rss/3_7014.xml",emitPlatform="/news/wsj",collectPlatform="/news/wsj",pollTime=5000)))
 
     //val bbc = context.actorOf(Props(classOf[News], new NewsConfig(id="bbc-health", url="www.bbc-health.com", pollTime=1)))
   }
