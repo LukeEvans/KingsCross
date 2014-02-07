@@ -142,6 +142,7 @@ class Abstractor {
       
       
       data.entities = extractor.getEntitiesFromAlchemy(data.text)
+
       Some(data)
     
     } catch {

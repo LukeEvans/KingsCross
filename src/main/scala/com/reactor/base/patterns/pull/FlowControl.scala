@@ -39,7 +39,9 @@ object FlowControlFactory extends {
 }
 
 class FlowControlMaster(config:FlowControlConfig, args:FlowControlArgs) extends Master(config.name) {
-   log.info("{} master starting...", config.name)
+
+
+  log.info("{} master starting...", config.name)
   
   args.addMaster(self)
   

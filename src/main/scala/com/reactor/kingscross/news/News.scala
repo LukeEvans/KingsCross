@@ -8,8 +8,6 @@ import scala.util.control.Breaks
 import org.apache.commons.lang.StringEscapeUtils
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.reactor.base.patterns.pull.FlowControlConfig
-import com.reactor.base.patterns.pull.FlowControlFactory
 import com.reactor.kingscross.config.{Config, NewsConfig}
 import com.reactor.kingscross.control.CollectEvent
 import com.reactor.kingscross.control.Collector
@@ -44,14 +42,6 @@ class NewsChannel {
 }
 
 class News(config:NewsConfig) extends Actor {
-
-  // Emitter
-  val emitter = context.actorOf(Props(classOf[NewsEmitter], config))
-  // Collector
-  val flowConfig = FlowControlConfig(name="newsCollector", actorType="com.reactor.kingscross.news.NewsCollector")
-  val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config))
-
-  
   // Ignore messages
   def receive = { case _ => }    
 }
@@ -83,7 +73,7 @@ class NewsEmitter(config:NewsConfig) extends Emitter(config) {
            if (entry.asInstanceOf[SyndEntry].getPublishedDate() == null) {
              entryMap += ("entry_pubdate" -> new Date().toString())
            } else {
-        	 entryMap += ("entry_pubdate" -> entry.asInstanceOf[SyndEntry].getPublishedDate().toString())  
+        	 entryMap += ("entry_pubdate" -> entry.asInstanceOf[SyndEntry].getPublishedDate().toString())
            }
          
            entryMap += ("entry_url" -> entry.asInstanceOf[SyndEntry].getLink())
@@ -105,11 +95,11 @@ class NewsEmitter(config:NewsConfig) extends Emitter(config) {
            }
          
            if (entry_text == "") {
-        	 entry_text = entry.asInstanceOf[SyndEntry].getDescription().getValue()
+        	 entry_text = entry.asInstanceOf[SyndEntry].getDescription.getValue
            } else {
-             var description = entry.asInstanceOf[SyndEntry].getDescription().getValue()
+             val description = entry.asInstanceOf[SyndEntry].getDescription.getValue
         	 if (description.length() > entry_text.length()) {
-        		 entry_text = description;
+        		 entry_text = description
              }
            }
            entryMap += ("entry_text" -> entry_text)
@@ -123,13 +113,14 @@ class NewsEmitter(config:NewsConfig) extends Emitter(config) {
            publish(event=entryNode, key=config.source_id + entryMap("entry_title"))
            entriesPublished += 1
            if(entriesPublished >= entryLimit) {
-             println("Emitter limit reached for " + config.source_id)
+             //println("Emitter limit reached for " + config.source_id)
              loop.break
            }
          }
        }
+       println(config.source_id + " emitter published " + entriesPublished + " stories")
      } catch {
-       case e:Exception => e.printStackTrace;
+       case e:Exception => e.printStackTrace
      }	  
   }  
 }
@@ -152,6 +143,7 @@ class NewsCollector(args:CollectorArgs) extends Collector(args) {
 	  var title:String = data.get("entry_title").asText()
 	  story.headline = StringEscapeUtils.unescapeHtml(title)
 	  story.pubdate = data.get("entry_pubdate").asText()
+    story.date = new Date(story.pubdate)
 	  story.link = data.get("entry_url").asText()
 	  story.author = data.get("entry_author").asText()
     
@@ -177,15 +169,11 @@ class NewsCollector(args:CollectorArgs) extends Collector(args) {
       println("Full text not found, can't summarize")
       return null
     }
-    
+
     val summarizor = new Summarizor()
-    val summary:String = summarizor.getSummary(headline,fullText)
-    
-    if (summary != null && !summary.equals("")) {
-      summary
-    }
-    else {
-      summarizor.firstTwoSentencesSummary(fullText)
+    summarizor.getSummary(headline,fullText) match {
+      case Some(summary:String) => return summary
+      case None => return null
     }
   }
   
@@ -208,7 +196,7 @@ class NewsCollector(args:CollectorArgs) extends Collector(args) {
     // Publish the news story object as json
 
     if (isDev) {
-      write_platform += "/dev"
+      write_platform = "store-/news/dev"
     }
 
     val mapper = new ObjectMapper() with ScalaObjectMapper
@@ -229,7 +217,7 @@ class NewsMongoStorer(args:StorerArgs) extends MongoStore(args) {
    
   def handleEvent(event:CollectEvent) {
     
-    //	TODO - make sure the story is not a duplicate
+    //	TODO - Make sure the story is not a duplicate
 
     insert(event.data)
     println("\nMongo Storer SAVE STORY\n")

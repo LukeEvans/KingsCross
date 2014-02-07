@@ -9,6 +9,7 @@ import com.reactor.base.utilities.Tools
 import com.fasterxml.jackson.databind.node.ArrayNode
 import java.util.regex.Pattern
 import java.util.regex.Matcher
+import java.util.Date
 
 class NewsStory {
   
@@ -27,6 +28,7 @@ class NewsStory {
   var author:String = null
   var summary: String = null
   var full_text:String = null
+  var date:Date = null
   var pubdate:String = null
   var link:String = null
   var source_icon_link:String= null
@@ -54,7 +56,7 @@ class NewsStory {
       for (abstractEntity:Entity <- abstractData.entities) {
         if(!entities.contains(abstractEntity)) {
           //	TODO merge entities of same name
-          entities + abstractEntity
+          entities += abstractEntity
         }
       } 
     }
@@ -119,9 +121,9 @@ class NewsStory {
     return cleanS
   }
   
-  def getReactorSpeech(text:String):String =  {
+  def getReactorSpeech(text:String):String =  {  // TODO Make return value an option
     
-    var postURL:String = "https://nlp.winstonapi.com/process"
+    val postURL:String = "https://nlp.winstonapi.com/process"
     var s:String = text
     if (s.length > 400) {
       s = s.substring(0,400)
@@ -129,29 +131,31 @@ class NewsStory {
       
     try {
       val textPost = new TextPost(s)
-      var node:JsonNode = Tools.postJSON(postURL,textPost)
-      if (node == null || node.path("sentences") == null) {
-        println("Invalid JSON node from Reactor speech engine")
-        return null
-      }
-      
-      if (node.path("sentences").isArray) {
-        val sentences = node.path("sentences")
-        var a = 0
-        var result:String = ""
-        for(a <- 0 until sentences.asInstanceOf[ArrayNode].size()) {
-          var sentence:String = sentences.get(a).asText
-          if (shouldAddSentence(sentence)) {
-            result += sentence + " "
+      Tools.postJSON(postURL,textPost) match {
+        case Some(node:JsonNode) =>
+          if (node.path("sentences") == null) {
+            println("Invalid JSON node from Reactor speech engine")
+            null
           }
-          if (result.length >= 200) {
-            return result
+
+          if (node.path("sentences").isArray) {
+            val sentences = node.path("sentences")
+
+            var result:String = ""
+            for(a <- 0 until sentences.asInstanceOf[ArrayNode].size()) {
+              val sentence:String = sentences.get(a).asText
+              if (shouldAddSentence(sentence)) {
+                result += sentence + " "
+              }
+              if (result.length >= 200) {
+                return result
+              }
+            }
           }
-        }
+
+        case None =>  null
       }
-      
-      
-      
+
     } catch {
       case e:Exception => e.printStackTrace
     }    

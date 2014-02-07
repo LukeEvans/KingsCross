@@ -19,15 +19,15 @@ class Topic {
     }
     val parentTopic = dbEntry.getAs[String]("parent_topic") match {
       case Some(s:String) => this.parent_topic = s
-      case None => println("No Parent Topic")
+      case None =>
     }
     val childTopics = dbEntry.getAs[Set[String]]("child_topics") match {
       case Some(s:Set[String]) => this.child_topics = s
-      case None => println("No Child Topic")
+      case None =>
     }
     val akaData = dbEntry.getAs[Set[String]]("akas") match {
-      case Some(s:Set[string]) => this.akas = s
-      case None => println("No akas found")
+      case Some(s:Set[String]) => this.akas = s
+      case None =>
     }
   }
 }
@@ -46,6 +46,8 @@ class TopicExtractor {
       println("ERROR: null entity set")
       return null
     }
+
+    // TODO Make sure story has summary and headline fields
     
     val extractedTopics:TopicSet = new TopicSet() 
     

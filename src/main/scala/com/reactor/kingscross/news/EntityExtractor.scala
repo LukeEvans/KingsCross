@@ -10,7 +10,7 @@ class EntityExtractor {
   var alchemyBaseURL:String = "http://access.alchemyapi.com/calls/text/TextGetRankedNamedEntities"
   
   
-  def getEntitiesFromAlchemy(text:String):Set[Entity] =  {
+  def getEntitiesFromAlchemy(text:String):Set[Entity] =  {    // TODO return option
     
     if (text == null || text.equals("")) {
       println("ERROR, no text to send to Alchemy")
@@ -29,7 +29,6 @@ class EntityExtractor {
     
     
     if (alchemyResult.path("status").asText().equalsIgnoreCase("ok")) {
-      var a = 0
       if (alchemyResult.path("entities").isArray()) {
         val entities:JsonNode = alchemyResult.get("entities")
         var result:Set[Entity] = Set()

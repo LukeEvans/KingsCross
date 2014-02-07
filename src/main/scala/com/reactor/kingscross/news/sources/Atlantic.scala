@@ -1,6 +1,6 @@
 package com.reactor.kingscross.news.sources
 
-import com.reactor.kingscross.control.{StorerArgs, CollectorArgs, EmitEvent}
+import com.reactor.kingscross.control.{CollectorArgs, EmitEvent}
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.JsonNode
 import com.reactor.kingscross.config.NewsConfig
@@ -9,22 +9,25 @@ import com.reactor.base.patterns.pull.FlowControlFactory
 import com.reactor.kingscross.news.Abstraction
 import com.reactor.kingscross.news.Entity
 import com.reactor.kingscross.news.News
+import com.reactor.kingscross.news.NewsEmitter
 import com.reactor.kingscross.news.NewsCollector
 import com.reactor.kingscross.news.NewsStory
 import com.reactor.kingscross.news.TopicSet
 import com.mongodb.casbah.commons.MongoDBObject
 import com.mongodb.DBObject
 import com.mongodb.casbah.MongoCollection
+import akka.actor.Props
 
 //================================================================================
 // 	The Atlantic
 //================================================================================
 
 class AtlanticNews(config:NewsConfig)  extends News(config:NewsConfig) {
-
-	// Collector
-	override val flowConfig = FlowControlConfig(name="atlanticCollector", actorType="com.reactor.kingscross.news.sources.AtlanticNewsCollector")
-	override val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
+  //Emitter
+  val emitter = context.actorOf(Props(classOf[NewsEmitter], config))
+  // Collector
+	val flowConfig = FlowControlConfig(name="atlanticCollector", actorType="com.reactor.kingscross.news.sources.AtlanticNewsCollector")
+	val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
 
 }
   
@@ -35,8 +38,6 @@ class AtlanticNewsCollector(args:CollectorArgs) extends NewsCollector(args:Colle
 
   override def handleEvent(event:EmitEvent) {
 
-    println("\nAtlantic Collecter creating story\n")
-    
     //	Fill out preliminary News Story fields
 	  val story:NewsStory = parseEventData(event.data)
 	  story.source_id = "atlantic"

@@ -122,7 +122,7 @@ object Tools {
     return md5
   }
 
-  def postJSON(url: String, body: Object): JsonNode = {
+  def postJSON(url: String, body: Object):Option[JsonNode] = {
 
     try {
       val httpClient: DefaultHttpClient = new DefaultHttpClient()
@@ -137,12 +137,12 @@ object Tools {
 
       val reader: BufferedReader = new BufferedReader(new InputStreamReader(response.getEntity.getContent, "UTF-8"))
       val json: String = reader.readLine
-      return mapper.readTree(json)
+      Some(mapper.readTree(json))
 
     } catch {
       case e: Exception => e.printStackTrace()
     }
-    null // TODO make return type an option
+    None
   }
 
   def fetchURL(url: String): JsonNode = {
