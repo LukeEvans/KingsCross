@@ -19,21 +19,20 @@ import com.mongodb.casbah.MongoCollection
 import akka.actor.Props
 
 //================================================================================
-// 	The Atlantic
-//  Notes: - abstract with Difbot
+// 	NHL
 //================================================================================
 
-class AtlanticNews(config:NewsConfig)  extends News(config:NewsConfig) {
+class NhlNews(config:NewsConfig)  extends News(config:NewsConfig) {
   //Emitter
   val emitter = context.actorOf(Props(classOf[NewsEmitter], config))
   // Collector
-	val flowConfig = FlowControlConfig(name="atlanticCollector", actorType="com.reactor.kingscross.news.sources.AtlanticNewsCollector")
+	val flowConfig = FlowControlConfig(name="nhlCollector", actorType="com.reactor.kingscross.news.sources.NhlNewsCollector")
 	val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
 
 }
-  
-  
-class AtlanticNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
+
+
+class NhlNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
 
   var isDevChannel:Boolean = false
 
@@ -41,12 +40,12 @@ class AtlanticNewsCollector(args:CollectorArgs) extends NewsCollector(args:Colle
 
     //	Fill out preliminary News Story fields
 	  val story:NewsStory = parseEventData(event.data)
-	  story.source_id = "atlantic"
+	  story.source_id = "nhlfeatured"
 	    
 	  
 	  //	TODO: Make a Mongo call only once a day - load data in an init method?
     //	TODO: Load parameters from Mongo
-	  story.ceiling_topic = "all_topics"
+	  story.ceiling_topic = "nhl"
 
 	  val channelCollection:MongoCollection = new MongoCollection(winstonDB.right.get.getCollection("winston-channels"))
 	  val query = MongoDBObject("db" -> story.source_id)
