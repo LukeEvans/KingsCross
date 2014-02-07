@@ -73,8 +73,16 @@ class NewsBootstrap extends Actor with ActorLogging {
     //val simplyRecipesID = "simplyRecipes"
     //val simplyRecipes = context.actorOf(Props(classOf[SimplyRecipesNews], new NewsConfig(id=simplyRecipesID,url="http://feeds.feedburner.com/elise/simplyrecipes",emitPlatform = "/news/"+simplyRecipesID,collectPlatform = "/news/"+simplyRecipesID,pollTime = 5000)))
 
-    val lottieDoofID = "lottieanddoof"
-    val lottieDoof = context.actorOf(Props(classOf[LottieDoofNews], new NewsConfig(id=lottieDoofID,url="http://feeds.feedburner.com/lottieanddoof",emitPlatform = "/news/"+lottieDoofID,collectPlatform = "/news/"+lottieDoofID,pollTime = 5000)))
+    //val lottieDoofID = "lottieanddoof"
+    //val lottieDoof = context.actorOf(Props(classOf[LottieDoofNews], new NewsConfig(id=lottieDoofID,url="http://feeds.feedburner.com/lottieanddoof",emitPlatform = "/news/"+lottieDoofID,collectPlatform = "/news/"+lottieDoofID,pollTime = 5000)))
+
+    val proFootballTalkID = "pro_football_talk"
+    val proFootballTalk = context.actorOf(Props(classOf[ProFootballTalkNews], new NewsConfig(id=proFootballTalkID,url="http://profootballtalk.nbcsports.com/category/rumor-mill/feed/atom/",emitPlatform = "/news/"+proFootballTalkID,collectPlatform = "/news/"+proFootballTalkID,pollTime = 5000)))
+
+
+
+
+
 
     //val bbc = context.actorOf(Props(classOf[News], new NewsConfig(id="bbc-health", url="www.bbc-health.com", pollTime=1)))
   }
