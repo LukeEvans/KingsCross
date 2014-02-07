@@ -119,7 +119,7 @@ class NewsEmitter(config:NewsConfig) extends Emitter(config) {
            }
          }
        }
-       println(config.source_id + " emitter published " + entriesPublished + " stories")
+       //println(config.source_id + " emitter published " + entriesPublished + " stories")   // TODO some kind of call back from super on whether or not a story is emitted
      } catch {
        case e:Exception => e.printStackTrace
      }	  

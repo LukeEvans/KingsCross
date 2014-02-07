@@ -19,33 +19,33 @@ import com.mongodb.casbah.MongoCollection
 import akka.actor.Props
 
 //================================================================================
-// 	The Atlantic
+// 	The Wall Street Journal
 //================================================================================
 
-class AtlanticNews(config:NewsConfig)  extends News(config:NewsConfig) {
+class WallStreetJournalNews(config:NewsConfig)  extends News(config:NewsConfig) {
   //Emitter
   val emitter = context.actorOf(Props(classOf[NewsEmitter], config))
   // Collector
-	val flowConfig = FlowControlConfig(name="atlanticCollector", actorType="com.reactor.kingscross.news.sources.AtlanticNewsCollector")
+	val flowConfig = FlowControlConfig(name="wshCollector", actorType="com.reactor.kingscross.news.sources.WallStreetJournalNewsCollector")
 	val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
 
 }
-  
-  
-class AtlanticNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
 
-  var isDevChannel:Boolean = false
+
+class WallStreetJournalNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
+
+  var isDevChannel:Boolean = true
 
   override def handleEvent(event:EmitEvent) {
 
     //	Fill out preliminary News Story fields
 	  val story:NewsStory = parseEventData(event.data)
-	  story.source_id = "atlantic"
+	  story.source_id = "wsj"
 	    
 	  
 	  //	TODO: Make a Mongo call only once a day - load data in an init method?
     //	TODO: Load parameters from Mongo
-	  story.ceiling_topic = "all_topics"
+	  story.ceiling_topic = "business"
 
 	  val channelCollection:MongoCollection = new MongoCollection(winstonDB.right.get.getCollection("winston-channels"))
 	  val query = MongoDBObject("db" -> story.source_id)
@@ -73,12 +73,12 @@ class AtlanticNewsCollector(args:CollectorArgs) extends NewsCollector(args:Colle
 
         channel.getAs[String]("category") match {
           case Some(s:String) => story.source_category = s
-          case None => println("WARNING: Category channel field missing for Atlantic")
+          case None => println("WARNING: Category channel field missing for " + story.source_id)
         }
 
         channel.getAs[String]("twitter_handle") match {
           case Some(s:String) => story.source_twitter_handle = s
-          case None => println("WARNING: twitter handle channel field missing for Atlantic")
+          case None => println("WARNING: twitter handle channel field missing for "+story.source_id)
         }
 
       case None =>
@@ -108,15 +108,15 @@ class AtlanticNewsCollector(args:CollectorArgs) extends NewsCollector(args:Colle
             }
             channel.getAs[String]("category") match {
               case Some(s:String) => story.source_category = s
-              case None => println("WARNING: Category channel field missing for Atlantic")
+              case None => println("WARNING: Category channel field missing for "+story.source_id)
             }
             channel.getAs[String]("twitter_handle") match {
               case Some(s:String) => story.source_twitter_handle = s
-              case None => println("WARNING: twitter handle channel field missing for Atlantic")
+              case None => println("WARNING: twitter handle channel field missing for "+story.source_id)
             }
 
           case None =>
-            println("ERROR: channel entry for Atlantic not found")
+            println("ERROR: channel entry for not found for "+story.source_id)
             complete()
             return
 
@@ -144,7 +144,7 @@ class AtlanticNewsCollector(args:CollectorArgs) extends NewsCollector(args:Colle
 	  //	Build article abstraction - this gets entire text and image URLs
 	  abstractWithDifbot(story.link)  match {
       case None =>
-        println("COLLECTOR ERROR - Story creation failed at extraction creation for Atlantic")
+        println("COLLECTOR ERROR - Story creation failed at extraction creation for "+story.source_id)
         complete()
         return
       case Some(difbotAbstraction:Abstraction) =>
