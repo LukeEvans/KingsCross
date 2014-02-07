@@ -2,16 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="efc85902-2277-427a-82f3-feaeb5b46ce4" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/Abstractor.scala" afterPath="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/Abstractor.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/sources/Atlantic.scala" afterPath="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/sources/Atlantic.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/EntityExtractor.scala" afterPath="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/EntityExtractor.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/com/reactor/base/patterns/pull/FlowControl.scala" afterPath="$PROJECT_DIR$/src/main/scala/com/reactor/base/patterns/pull/FlowControl.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/control/Emitter.scala" afterPath="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/control/Emitter.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/News.scala" afterPath="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/News.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/NewsStory.scala" afterPath="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/NewsStory.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/Summarizor.scala" afterPath="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/Summarizor.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/com/reactor/base/utilities/Tools.scala" afterPath="$PROJECT_DIR$/src/main/scala/com/reactor/base/utilities/Tools.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/TopicExtractor.scala" afterPath="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/TopicExtractor.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/bootstrap/NewsBootstrap.scala" afterPath="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/bootstrap/NewsBootstrap.scala" />
     </list>
     <ignored path="KingsCross.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -71,7 +64,23 @@
       </breakpoint>
     </breakpoint_any>
     <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
-    <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true" />
+    <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true">
+      <breakpoint url="file://$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/News.scala" line="252" class="com.reactor.kingscross.news.NewsMongoStorer" package="com.reactor.kingscross.news">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+    </line_breakpoints>
     <breakpoint_rules />
     <ui_properties />
   </component>
@@ -81,10 +90,30 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
+      <file leaf-file-name="NewsBootstrap.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/bootstrap/NewsBootstrap.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="60" column="226" selection-start="3184" selection-end="3184" vertical-scroll-proportion="0.0" vertical-offset="345" max-vertical-offset="1215">
+              <folding>
+                <element signature="e#42#65#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Emitter.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/control/Emitter.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="40" column="19" selection-start="1219" selection-end="1219" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="780">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="News.scala" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/News.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="198" column="30" selection-start="7037" selection-end="7037" vertical-scroll-proportion="-0.09550562" vertical-offset="3038" max-vertical-offset="4065">
+            <state line="221" column="85" selection-start="7668" selection-end="7668" vertical-scroll-proportion="0.54353935" vertical-offset="2928" max-vertical-offset="4650">
               <folding>
                 <element signature="e#37#56#0" expanded="true" />
               </folding>
@@ -95,10 +124,17 @@
       <file leaf-file-name="Atlantic.scala" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/sources/Atlantic.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="39" column="0" selection-start="1607" selection-end="1607" vertical-scroll-proportion="0.0" vertical-offset="675" max-vertical-offset="2910">
-              <folding>
-                <element signature="e#45#109#0" expanded="true" />
-              </folding>
+            <state line="16" column="0" selection-start="733" selection-end="760" vertical-scroll-proportion="-9.230769" vertical-offset="0" max-vertical-offset="2910">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MongoStore.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/store/MongoStore.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="24" column="0" selection-start="748" selection-end="748" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="540">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -137,7 +173,6 @@
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/control/Collector.scala" />
-        <option value="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/bootstrap/NewsBootstrap.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/EntityExtractor.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/Abstractor.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/com/reactor/base/patterns/pull/FlowControl.scala" />
@@ -146,6 +181,8 @@
         <option value="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/NewsStory.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/sources/Atlantic.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/TopicExtractor.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/bootstrap/NewsBootstrap.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/control/Emitter.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/News.scala" />
       </list>
     </option>
@@ -154,9 +191,9 @@
     <treeState />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="167" />
+    <option name="x" value="683" />
     <option name="y" value="38" />
-    <option name="width" value="2370" />
+    <option name="width" value="1854" />
     <option name="height" value="1281" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
@@ -1023,7 +1060,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="167" y="38" width="2370" height="1281" extended-state="0" />
+    <frame x="683" y="38" width="1854" height="1281" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -1039,11 +1076,11 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.26324642" sideWeight="0.6432616" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977778" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.13487972" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.13487972" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32973227" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.15120275" sideWeight="0.49937108" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.1942605" sideWeight="0.49937108" order="1" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977778" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="6" side_tool="false" content_ui="combo" />
@@ -1154,9 +1191,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/sources/Atlantic.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state line="33" column="66" selection-start="1437" selection-end="1437" vertical-scroll-proportion="0.0" vertical-offset="495" max-vertical-offset="2895">
-          <folding>
-            <element signature="e#45#109#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1241,11 +1276,6 @@
         <state line="8" column="11" selection-start="220" selection-end="220" vertical-scroll-proportion="0.1517067" vertical-offset="0" max-vertical-offset="791" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/control/Emitter.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="15" selection-start="505" selection-end="505" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="735" />
-      </provider>
-    </entry>
     <entry file="jar://$USER_HOME$/.sbt/boot/scala-2.10.2/lib/scala-library.jar!/scala/concurrent/forkjoin/ForkJoinWorkerThread.class">
       <provider selected="true" editor-type-id="text-editor">
         <state line="21" column="42" selection-start="777" selection-end="777" vertical-scroll-proportion="-12.0" vertical-offset="0" max-vertical-offset="390" />
@@ -1287,13 +1317,6 @@
     <entry file="file://$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/Abstractor.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state line="145" column="0" selection-start="4612" selection-end="4612" vertical-scroll-proportion="-8.769231" vertical-offset="1812" max-vertical-offset="2655">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/store/MongoStore.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="0" selection-start="748" selection-end="748" vertical-scroll-proportion="0.4008439" vertical-offset="0" max-vertical-offset="711">
           <folding />
         </state>
       </provider>
@@ -1349,15 +1372,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/bootstrap/NewsBootstrap.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="54" column="0" selection-start="2744" selection-end="2744" vertical-scroll-proportion="0.77253217" vertical-offset="270" max-vertical-offset="1215">
-          <folding>
-            <element signature="e#42#65#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/NewsStory.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state line="161" column="29" selection-start="4710" selection-end="4710" vertical-scroll-proportion="-24.115385" vertical-offset="1788" max-vertical-offset="3885">
@@ -1367,18 +1381,39 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/store/MongoStore.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="0" selection-start="748" selection-end="748" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="540">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/sources/Atlantic.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="39" column="0" selection-start="1607" selection-end="1607" vertical-scroll-proportion="0.0" vertical-offset="105" max-vertical-offset="2910">
+        <state line="16" column="0" selection-start="733" selection-end="760" vertical-scroll-proportion="-9.230769" vertical-offset="0" max-vertical-offset="2910">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/control/Emitter.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="40" column="19" selection-start="1219" selection-end="1219" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="780">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/bootstrap/NewsBootstrap.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="60" column="226" selection-start="3184" selection-end="3184" vertical-scroll-proportion="0.0" vertical-offset="345" max-vertical-offset="1215">
           <folding>
-            <element signature="e#45#109#0" expanded="true" />
+            <element signature="e#42#65#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/com/reactor/kingscross/news/News.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="198" column="30" selection-start="7037" selection-end="7037" vertical-scroll-proportion="-0.09550562" vertical-offset="3038" max-vertical-offset="4065">
+        <state line="221" column="85" selection-start="7668" selection-end="7668" vertical-scroll-proportion="0.54353935" vertical-offset="2928" max-vertical-offset="4650">
           <folding>
             <element signature="e#37#56#0" expanded="true" />
           </folding>

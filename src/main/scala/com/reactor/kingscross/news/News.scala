@@ -8,7 +8,7 @@ import scala.util.control.Breaks
 import org.apache.commons.lang.StringEscapeUtils
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.reactor.kingscross.config.{Config, NewsConfig}
+import com.reactor.kingscross.config.NewsConfig
 import com.reactor.kingscross.control.CollectEvent
 import com.reactor.kingscross.control.Collector
 import com.reactor.kingscross.control.CollectorArgs
@@ -24,11 +24,12 @@ import com.sun.syndication.feed.synd.SyndEntry
 import com.sun.syndication.io.SyndFeedInput
 import com.sun.syndication.io.XmlReader
 import akka.actor.Actor
-import akka.actor.Props
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.databind.DeserializationFeature
-import com.mongodb.casbah.MongoURI
+import com.mongodb.casbah.{MongoCollection, MongoURI}
+import com.mongodb.casbah.commons.MongoDBObject
+import com.mongodb.DBObject
 
 
 class NewsChannel {
@@ -205,7 +206,7 @@ class NewsCollector(args:CollectorArgs) extends Collector(args) {
     
     val json:JsonNode = mapper.valueToTree(story)
     
-    println("\nPublishing story to " + write_platform + " from " + story.source_id + " headline:\n" + story.headline + "\n")
+    println("\nPublishing story from " + story.source_id + " headline = " + story.headline + "\n")
     
     publish(json)  
   }
@@ -214,21 +215,59 @@ class NewsCollector(args:CollectorArgs) extends Collector(args) {
 
 // Mongo
 class NewsMongoStorer(args:StorerArgs) extends MongoStore(args) {
-   
+
   def handleEvent(event:CollectEvent) {
     
     //	TODO - Make sure the story is not a duplicate
 
-    insert(event.data)
-    println("\nMongo Storer SAVE STORY\n")
-	  complete()
-    
-    // Take event.data (NewsStory object stored as json) and store it in Mongo
-	// insert(story)
-	  	
-	// Publish event.data complete message (Optional)
-	// publish(event.data)
-       	
+    val source_id:String = event.data.path("source_id").asText()
+    val headline:String = event.data.path("headline").asText()
+    val isValid:Boolean = event.data.path("valid").asBoolean(false)
+
+    if (source_id == null || headline == null) {
+      //  Don't save story
+      complete()
+      return
+    }
+
+
+    val newsCollection:MongoCollection = new MongoCollection(db.right.get.getCollection(collection))
+    val query = MongoDBObject("source_id" -> source_id, "headline" -> headline)
+    newsCollection.findOne(query) match {
+      case Some(x:DBObject) =>
+        //  Found a matching story in the DB, see if it is valid
+        val storyMatch = new MongoDBObject(x)
+        val oldStoryValid:Boolean =  storyMatch.getAs[Boolean]("valid") match {
+          case Some(a:Boolean) => a
+          case None => false
+        }
+        if (oldStoryValid) {
+          //  Don't overwrite valid story
+          println("\nDuplicate Story, don't save to Mongo\n")
+          complete()
+          return
+        }
+        else {
+          if (isValid) {
+            // New story is valid, old one is not, delete old story and publish
+            println("\nFixed old invalid story, saving\n")
+            newsCollection.remove(storyMatch.asDBObject)
+            insert(event.data)
+            complete()
+            return
+          }
+          else {
+            // New story and old story are invalid, do not overwrite old story
+            println("Duplicate story, both invalid, don't save to mongo")
+            complete()
+            return
+          }
+        }
+      case None =>
+        //  No matching story, save to Mongo
+        insert(event.data)
+        complete()
+    }
     
   }   
 }

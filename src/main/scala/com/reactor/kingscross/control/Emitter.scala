@@ -35,7 +35,10 @@ abstract class Emitter(config:PollingConfig) extends Actor with ActorLogging {
     
     // publish event to bus
     def publish(event:JsonNode, key:String) {
-    	if (keysSeen.contains(key)) return
+    	if (keysSeen.contains(key)) {
+        println("Have already seen key "+key)
+        return
+      }
     	
 
     	mediator ! Publish(write_platform, EmitEvent(event))
