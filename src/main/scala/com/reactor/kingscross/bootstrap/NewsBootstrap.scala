@@ -67,8 +67,11 @@ class NewsBootstrap extends Actor with ActorLogging {
     //val yahooSportsNhl = context.actorOf(Props(classOf[YahooSportsNhlNews], new NewsConfig(id="yahoosports_nhl",url="http://sports.yahoo.com/nhl/rss.xml",emitPlatform="/news/yahoosports_nhl",collectPlatform = "/news/yahoosports_nhl",pollTime = 5000)))
     //val nhl = context.actorOf(Props(classOf[NhlNews], new NewsConfig(id="nhlfeatured",url="http://www.nhl.com/rss/features.xml",emitPlatform = "/news/nhlfeatured",collectPlatform = "/news/nhlfeatured",pollTime = 5000)))
 
-    val theHockeyNewsId:String = "thehockeynews"
-    val theHockeyNews = context.actorOf(Props(classOf[TheHockeyNewsNews], new NewsConfig(id=theHockeyNewsId,url="http://thehockeynews.com.feedsportal.com/c/34166/f/621201/index.rss",emitPlatform = "/news/"+theHockeyNewsId,collectPlatform = "/news/"+theHockeyNewsId,pollTime = 5000)))
+    //val theHockeyNewsId:String = "thehockeynews"
+    //val theHockeyNews = context.actorOf(Props(classOf[TheHockeyNewsNews], new NewsConfig(id=theHockeyNewsId,url="http://thehockeynews.com.feedsportal.com/c/34166/f/621201/index.rss",emitPlatform = "/news/"+theHockeyNewsId,collectPlatform = "/news/"+theHockeyNewsId,pollTime = 5000)))
+
+    val simplyRecipesID = "simplyRecipes"
+    val simplyRecipes = context.actorOf(Props(classOf[SimplyRecipesNews], new NewsConfig(id=simplyRecipesID,url="http://feeds.feedburner.com/elise/simplyrecipes",emitPlatform = "/news/"+simplyRecipesID,collectPlatform = "/news/"+simplyRecipesID,pollTime = 5000)))
 
     //val bbc = context.actorOf(Props(classOf[News], new NewsConfig(id="bbc-health", url="www.bbc-health.com", pollTime=1)))
   }

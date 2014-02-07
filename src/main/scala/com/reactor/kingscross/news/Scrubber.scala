@@ -57,6 +57,11 @@ class Scrubber {
  
   
   private def clean(s:String):String = {
+
+    if(s == null) {
+      null
+    }
+
     var cleanString:String = s.replaceAll("\\<.*?\\>", " ")
     cleanString = cleanString.replaceAll("\"", " ");
 	  cleanString = cleanString.replaceAll("-", " ");

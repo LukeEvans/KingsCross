@@ -176,7 +176,7 @@ class YahooSportsNhlNewsCollector(args:CollectorArgs) extends NewsCollector(args
         story.related_topics = extractedTopics.relatedTopics
         story.main_topics = extractedTopics.mainTopics
 
-        story.valid = story.checkValid()
+        story.valid = story.checkValid(true)
 
         publishStory(story, isDevChannel)
 

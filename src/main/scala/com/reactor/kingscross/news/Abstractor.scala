@@ -90,8 +90,8 @@ class Abstractor {
           val urlNode = difbotResult.get("url")
           if (urlNode == null) None
 
-          data.title = clean(titleNode.asText())
-          data.text = clean(textNode.asText())
+          data.title = clean(titleNode.asText)
+          data.text = clean(textNode.asText)
           data.url = urlNode.asText()
 
           // Get Images
@@ -176,6 +176,7 @@ class Abstractor {
 	  s = s.replaceAll("&lsquo;", "'")
 	  s = s.replaceAll("&mdash;", "-")
 	  s = s.replaceAll("&ndash;", "-")
+    s = s.replaceAll("\\n"," ")
 	  s = StringEscapeUtils.unescapeHtml(s)
     s
   }

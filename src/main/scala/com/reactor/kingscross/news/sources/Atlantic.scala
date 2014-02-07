@@ -176,7 +176,7 @@ class AtlanticNewsCollector(args:CollectorArgs) extends NewsCollector(args:Colle
         story.related_topics = extractedTopics.relatedTopics
         story.main_topics = extractedTopics.mainTopics
 
-        story.valid = story.checkValid()
+        story.valid = story.checkValid(false)
 
         publishStory(story, isDevChannel)
 

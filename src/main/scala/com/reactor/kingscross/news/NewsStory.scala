@@ -169,7 +169,7 @@ class NewsStory {
     return true
   }
   
-  def checkValid():Boolean = {
+  def checkValid(allowFirstPerson:Boolean):Boolean = {
     
     if (story_type != "News") {
       println("Story is invalid due to errant story_type")
@@ -201,9 +201,14 @@ class NewsStory {
       return false
     }
     
-    if (speech == null || speech.length() < 60 || isFirstPerson(speech)) {
+    if (speech == null || speech.length() < 60) {
      println("Story is invalid due to errant speech")
      return false
+    }
+
+    if (!allowFirstPerson && isFirstPerson(speech)) {
+      println("Story is invalid due to first person speech")
+      false
     }
     
     if (pubdate == null || pubdate.length == 0) {
