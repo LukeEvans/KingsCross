@@ -71,79 +71,84 @@ class Abstractor {
     
     try {
       //	Call diffbot and create an Abstraction object      
-      val difbotResult:JsonNode = Tools.fetchURL(baseDifbotURL + url)
-      
-      /*val mapper:ObjectMapper = new ObjectMapper()
-      println("\nDiffbot Result:")
-      println(mapper.writeValueAsString(difbotResult)+"\n")*/
-      
-      
-      var data = new Abstraction()
+      Tools.fetchURL(baseDifbotURL + url) match {
+        case None => None
+        case Some(difbotResult:JsonNode) =>
 
-      val titleNode = difbotResult.get("title")
-      if (titleNode == null) None
+          /*val mapper:ObjectMapper = new ObjectMapper()
+          println("\nDiffbot Result:")
+          println(mapper.writeValueAsString(difbotResult)+"\n")*/
 
-      val textNode = difbotResult.get("text")
-      if (textNode == null) None
+          var data = new Abstraction()
 
-      val urlNode = difbotResult.get("url")
-      if (urlNode == null) None
+          val titleNode = difbotResult.get("title")
+          if (titleNode == null) None
 
-      data.title = clean(titleNode.asText())
-      data.text = clean(textNode.asText())
-      data.url = urlNode.asText()
+          val textNode = difbotResult.get("text")
+          if (textNode == null) None
 
-      // Get Images
-      val mediaNode = difbotResult.path("media")
-      if (mediaNode.asInstanceOf[JsonNode].isArray) {
-        for( a <- 0 until mediaNode.asInstanceOf[ArrayNode].size()) {
-          val media:JsonNode = mediaNode.asInstanceOf[ArrayNode].get(a)
+          val urlNode = difbotResult.get("url")
+          if (urlNode == null) None
 
-          //	Only work with multimedia of type 'image'
-          val mediaType:String = media.path("type").asText()
-          if (mediaType != null && mediaType.equalsIgnoreCase("image")) {
-            val primaryStatus:String = media.path("primary").asText()
-            var link:String = media.path("link").asText()
+          data.title = clean(titleNode.asText())
+          data.text = clean(textNode.asText())
+          data.url = urlNode.asText()
 
-            //println("Found image link in Difbot - "+link)
+          // Get Images
+          val mediaNode = difbotResult.path("media")
+          if (mediaNode.asInstanceOf[JsonNode].isArray) {
+            for( a <- 0 until mediaNode.asInstanceOf[ArrayNode].size()) {
+              val media:JsonNode = mediaNode.asInstanceOf[ArrayNode].get(a)
 
-            //	Filter out small images and bad links
-            if (isValidImageLink(link.toLowerCase)) {
-              val i:Image = Tools.getImageFromURL(link)
-              if (i.getHeight(null) > 100 && i.getWidth(null) > 100) {
-                link = link.replaceAll(" ","%20")
+              //	Only work with multimedia of type 'image'
+              val mediaType:String = media.path("type").asText()
+              if (mediaType != null && mediaType.equalsIgnoreCase("image")) {
+                val primaryStatus:String = media.path("primary").asText()
+                var link:String = media.path("link").asText()
 
-                //	Image is large enough, add to appropriate image set
-                if (primaryStatus != null && primaryStatus.equalsIgnoreCase("true")) {
-                  data.primary_images += link
-                  //println(link + " added to primary images")
+                //println("Found image link in Difbot - "+link)
+
+                //	Filter out small images and bad links
+                if (isValidImageLink(link.toLowerCase)) {
+                  val i:Image = Tools.getImageFromURL(link)
+                  if (i.getHeight(null) > 100 && i.getWidth(null) > 100) {
+                    link = link.replaceAll(" ","%20")
+
+                    //	Image is large enough, add to appropriate image set
+                    if (primaryStatus != null && primaryStatus.equalsIgnoreCase("true")) {
+                      data.primary_images += link
+                      //println(link + " added to primary images")
+                    }
+                    else {
+                      data.secondary_images += link
+                      //println(link + " added to secondary images")
+                    }
+                  }
+                  else {
+                    //println(link + " is too small an image")
+                  }
                 }
                 else {
-                  data.secondary_images += link
-                  //println(link + " added to secondary images")
+                  //println(link + " is an invalid image link")
                 }
               }
-              else {
-                //println(link + " is too small an image")
-              }
-            }
-            else {
-              //println(link + " is an invalid image link")
             }
           }
-        }
+
+          //println("\nDifbot found " + data.primary_images.size + " primary images and " + data.secondary_images.size + " secondary images\n")
+
+          //	Get Entities for Abstraction
+          //	TODO create extractor on actor init
+          val extractor = new EntityExtractor()
+
+
+          data.entities = extractor.getEntitiesFromAlchemy(data.text)
+
+          Some(data)
       }
-
-      //println("\nDifbot found " + data.primary_images.size + " primary images and " + data.secondary_images.size + " secondary images\n")
-		
-      //	Get Entities for Abstraction
-      //	TODO create extractor on actor init
-      val extractor = new EntityExtractor()
       
-      
-      data.entities = extractor.getEntitiesFromAlchemy(data.text)
 
-      Some(data)
+
     
     } catch {
       case e:Exception => e.printStackTrace;

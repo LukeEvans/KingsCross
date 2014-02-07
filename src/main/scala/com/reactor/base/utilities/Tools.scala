@@ -145,10 +145,10 @@ object Tools {
     None
   }
 
-  def fetchURL(url: String): JsonNode = {
+  def fetchURL(url: String):Option[JsonNode] = {
     try {
       val httpClient = new DefaultHttpClient()
-      httpClient.getParams.setParameter("http.socket.timeout", new Integer(20000))
+      httpClient.getParams.setParameter("http.socket.timeout", new Integer(40000))
       val getRequest = new HttpGet(parseUrl(url).toString)
       getRequest.addHeader("accept", "application/json")
 
@@ -158,14 +158,20 @@ object Tools {
       val mapper = new ObjectMapper()
       val reader = new BufferedReader(new InputStreamReader(response.getEntity.getContent, "UTF-8"))
 
-      mapper.readTree(reader)
+      Some(mapper.readTree(reader))
 
     } catch {
       case e: Exception =>
-        val subURL: String = url.substring(0, 100)
-        System.out.println("\nERROR: HTTP Exception at " + subURL + "\n")
-        e.printStackTrace()
-        return null
+        var subURL:String = ""
+        if (url.size <= 200) {
+          subURL = url
+        }
+        else {
+          subURL = url.substring(0,200)
+        }
+        System.out.println("\nERROR: HTTP Exception at " + subURL + "\n"+e.getMessage+" "+e.getCause)
+        //e.printStackTrace()
+        None
     }
   }
 
@@ -211,36 +217,34 @@ object Tools {
   // URL encoding Methods
   //================================================================================
   def parseUrl(s: String): URL = {
-    var u: URL = null;
+    var u: URL = null
     try {
-      u = new URL(s);
+      u = new URL(s)
       try {
         return new URI(
-          u.getProtocol(),
-          u.getAuthority(),
-          u.getPath(),
-          u.getQuery(),
-          u.getRef()).toURL();
+          u.getProtocol,
+          u.getAuthority,
+          u.getPath,
+          u.getQuery,
+          u.getRef).toURL
       } catch {
-        case e: Exception => {
-          e.printStackTrace();
+        case e: Exception => e.printStackTrace()
 
-        }
       }
     }
-    return null;
+    null
   }
 
   def decodeCharacters(input: String): String = {
-    var output = StringEscapeUtils.escapeHtml4(input);
-    output = output.replaceAll("&rdquo;", "&quot;");
-    output = output.replaceAll("&ldquo;", "&quot;");
-    output = output.replaceAll("&lsquo;", "'");
-    output = output.replaceAll("&rsquo;", "'");
-    output = output.replaceAll("&mdash;", "-");
-    output = StringEscapeUtils.unescapeHtml4(output);
+    var output = StringEscapeUtils.escapeHtml4(input)
+    output = output.replaceAll("&rdquo;", "&quot;")
+    output = output.replaceAll("&ldquo;", "&quot;")
+    output = output.replaceAll("&lsquo;", "'")
+    output = output.replaceAll("&rsquo;", "'")
+    output = output.replaceAll("&mdash;", "-")
+    output = StringEscapeUtils.unescapeHtml4(output)
 
-    return output;
+    output
   }
 }
 

@@ -73,12 +73,12 @@ class AtlanticNewsCollector(args:CollectorArgs) extends NewsCollector(args:Colle
 
         channel.getAs[String]("category") match {
           case Some(s:String) => story.source_category = s
-          case None => println("WARNING: Category channel field missing for Atlantic")
+          case None => println("WARNING: Category channel field missing for " + story.source_id)
         }
 
         channel.getAs[String]("twitter_handle") match {
           case Some(s:String) => story.source_twitter_handle = s
-          case None => println("WARNING: twitter handle channel field missing for Atlantic")
+          case None => println("WARNING: twitter handle channel field missing for "+story.source_id)
         }
 
       case None =>
@@ -108,15 +108,15 @@ class AtlanticNewsCollector(args:CollectorArgs) extends NewsCollector(args:Colle
             }
             channel.getAs[String]("category") match {
               case Some(s:String) => story.source_category = s
-              case None => println("WARNING: Category channel field missing for Atlantic")
+              case None => println("WARNING: Category channel field missing for "+story.source_id)
             }
             channel.getAs[String]("twitter_handle") match {
               case Some(s:String) => story.source_twitter_handle = s
-              case None => println("WARNING: twitter handle channel field missing for Atlantic")
+              case None => println("WARNING: twitter handle channel field missing for "+story.source_id)
             }
 
           case None =>
-            println("ERROR: channel entry for Atlantic not found")
+            println("ERROR: channel entry not found for "+story.source_id)
             complete()
             return
 
@@ -144,7 +144,7 @@ class AtlanticNewsCollector(args:CollectorArgs) extends NewsCollector(args:Colle
 	  //	Build article abstraction - this gets entire text and image URLs
 	  abstractWithDifbot(story.link)  match {
       case None =>
-        println("COLLECTOR ERROR - Story creation failed at extraction creation for Atlantic")
+        println("COLLECTOR ERROR - Story creation failed at extraction creation for "+story.source_id)
         complete()
         return
       case Some(difbotAbstraction:Abstraction) =>
@@ -164,7 +164,10 @@ class AtlanticNewsCollector(args:CollectorArgs) extends NewsCollector(args:Colle
         story.summary = getSummary(story.headline,story.full_text)
         story.speech = story.summary // TODO lots going on with speech field, can we simplify?
 
-        story.speech = scrubSpeech(story.speech)
+        story.speech = scrubSpeech(story.speech) match {
+          case Some(newSpeech:String) => newSpeech
+          case None => story.speech
+        }
         story.full_text = scrubFullText(story.full_text)
 
         //	Topic Extraction

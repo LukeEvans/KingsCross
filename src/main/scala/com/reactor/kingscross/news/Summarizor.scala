@@ -29,19 +29,22 @@ class Summarizor {
   def firstTwoSentencesSummaryFromNLP(fullText:String):Option[String] = {
     
     try {
-      val result:JsonNode = Tools.fetchURL("http://nlp-winston.elasticbeanstalk.com/process?text="+fullText)
-      var summary:String = ""
-      if (result.has("sentences")) {
-        if (result.get("sentences").size() > 1)   {
-          summary = result.get("sentences").get(0).asText + " " + result.get("sentences").get(1).asText
-          Some(summary)
-        }
-        else {
-          firstTwoSentencesSummaryFromText(fullText)
-        }
-      }
-      else {
-        firstTwoSentencesSummaryFromText(fullText)
+      Tools.fetchURL("http://nlp-winston.elasticbeanstalk.com/process?text="+fullText) match {
+        case Some(result:JsonNode) =>
+          var summary:String = ""
+          if (result.has("sentences")) {
+            if (result.get("sentences").size() > 1)   {
+              summary = result.get("sentences").get(0).asText + " " + result.get("sentences").get(1).asText
+              Some(summary)
+            }
+            else {
+              firstTwoSentencesSummaryFromText(fullText)
+            }
+          }
+          else {
+            firstTwoSentencesSummaryFromText(fullText)
+          }
+        case None => firstTwoSentencesSummaryFromText(fullText)
       }
     } catch {
       case e:Exception => e.printStackTrace()
@@ -75,13 +78,13 @@ class Summarizor {
 
         summary += s + "."
 
-        if (summary.length > 50) {
+        if (summary.length > 100) {
           break()
         }
       }
     }
 
-    if(summary.length > 50) {
+    if(summary.length > 100) {
       // Clean Summary
       summary = summary.replaceAll("&quot;", "\"")
       summary = summary.replaceAll("&rdquo;", "\"")

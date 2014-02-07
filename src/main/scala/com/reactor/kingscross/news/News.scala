@@ -178,7 +178,7 @@ class NewsCollector(args:CollectorArgs) extends Collector(args) {
     }
   }
   
-  def scrubSpeech(speech:String):String = {
+  def scrubSpeech(speech:String):Option[String] = {
     val scrubber:Scrubber = new Scrubber()
     return scrubber.scrubSpeechEvent(speech)
   }
