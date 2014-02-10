@@ -19,21 +19,21 @@ import com.mongodb.casbah.MongoCollection
 import akka.actor.Props
 
 //================================================================================
-// 	TechCrunch
+// 	White on Rice
 //  Notes: - abstract with Difbot
 //================================================================================
 
-class TechCrunchNews(config:NewsConfig)  extends News(config:NewsConfig) {
+class WhiteOnRiceNews(config:NewsConfig)  extends News(config:NewsConfig) {
   //Emitter
   val emitter = context.actorOf(Props(classOf[NewsEmitter], config))
   // Collector
-	val flowConfig = FlowControlConfig(name="techCrunchCollector", actorType="com.reactor.kingscross.news.sources.TechCrunchNewsCollector")
+	val flowConfig = FlowControlConfig(name="whiteOnRiceCollector", actorType="com.reactor.kingscross.news.sources.WhiteOnRiceNewsCollector")
 	val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
 
 }
 
 
-class TechCrunchNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
+class WhiteOnRiceNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
 
   var isDevChannel:Boolean = false
 
@@ -41,12 +41,12 @@ class TechCrunchNewsCollector(args:CollectorArgs) extends NewsCollector(args:Col
 
     //	Fill out preliminary News Story fields
 	  val story:NewsStory = parseEventData(event.data)
-	  story.source_id = "techcrunch"
+	  story.source_id = "whiteonrice"
 	    
 	  
 	  //	TODO: Make a Mongo call only once a day - load data in an init method?
     //	TODO: Load parameters from Mongo
-	  story.ceiling_topic = "technology"
+	  story.ceiling_topic = "recipes"
 
 	  val channelCollection:MongoCollection = new MongoCollection(winstonDB.right.get.getCollection("winston-channels"))
 	  val query = MongoDBObject("db" -> story.source_id)

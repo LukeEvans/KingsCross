@@ -112,11 +112,32 @@ class NewsBootstrap extends Actor with ActorLogging {
     //val fashionologieID = "fashionologie"
     //val fashionologie = context.actorOf(Props(classOf[FashionologieNews], new NewsConfig(id=fashionologieID,url="http://www.fashionologie.com/posts/feed",emitPlatform = "/news/"+fashionologieID,collectPlatform = "/news/"+fashionologieID,pollTime = 5000)))
 
-    val vergeID = "the_verge"
-    val verge = context.actorOf(Props(classOf[VergeNews], new NewsConfig(id=vergeID,url="http://www.theverge.com/rss/index.xml",emitPlatform = "/news/"+vergeID,collectPlatform = "/news/"+vergeID,pollTime = 5000)))
+    //val vergeID = "the_verge"
+    //val verge = context.actorOf(Props(classOf[VergeNews], new NewsConfig(id=vergeID,url="http://www.theverge.com/rss/index.xml",emitPlatform = "/news/"+vergeID,collectPlatform = "/news/"+vergeID,pollTime = 5000)))
 
-    val techcrunchID = "techcrunch"
-    val techcrunch = context.actorOf(Props(classOf[TechCrunchNews], new NewsConfig(id=techcrunchID,url="http://feeds.feedburner.com/TechCrunch/",emitPlatform = "/news/"+techcrunchID,collectPlatform = "/news/"+techcrunchID,pollTime = 5000)))
+    //val techcrunchID = "techcrunch"
+    //val techcrunch = context.actorOf(Props(classOf[TechCrunchNews], new NewsConfig(id=techcrunchID,url="http://feeds.feedburner.com/TechCrunch/",emitPlatform = "/news/"+techcrunchID,collectPlatform = "/news/"+techcrunchID,pollTime = 5000)))
+
+    //val usaTodaySportsID = "usatoday_sports"
+    //val usaTodaySports =   context.actorOf(Props(classOf[UsaTodaySportsNews], new NewsConfig(id=usaTodaySportsID,url="http://rssfeeds.usatoday.com/UsatodaycomSports-TopStories",emitPlatform = "/news/"+usaTodaySportsID,collectPlatform = "/news/"+usaTodaySportsID,pollTime = 5000)))
+
+    //val usaTodayHockeyID = "usatoday_hockey"
+    //val usaTodayHockey = context.actorOf(Props(classOf[UsaTodayHockeyNews], new NewsConfig(id=usaTodayHockeyID,url="http://rssfeeds.usatoday.com/UsatodaycomNhl-TopStories",emitPlatform = "/news/"+usaTodayHockeyID,collectPlatform = "/news/"+usaTodayHockeyID,pollTime = 5000)))
+
+    //val onionID = "the_onion"
+    //val onion = context.actorOf(Props(classOf[OnionNews], new NewsConfig(id=onionID,url="http://feeds.theonion.com/theonion/daily",emitPlatform = "/news/"+onionID,collectPlatform = "/news/"+onionID,pollTime = 5000)))
+
+    //val engadgetID = "engadget"
+    //val engadget = context.actorOf(Props(classOf[EngadgetNews], new NewsConfig(id=engadgetID,url="http://www.engadget.com/rss.xml",emitPlatform = "/news/"+engadgetID,collectPlatform = "/news/"+engadgetID,pollTime = 5000)))
+
+    //val guardianID = "guardian"
+    //val guardian = context.actorOf(Props(classOf[GuardianNews], new NewsConfig(id=guardianID,url="http://feeds.guardian.co.uk/theguardian/us-home/rss",emitPlatform = "/news/"+guardianID,collectPlatform = "/news/"+guardianID,pollTime = 5000)))
+
+    val washPostID = "washpost_world"
+    val washPost = context.actorOf(Props(classOf[WashingtonPostNews], new NewsConfig(id=washPostID,url="http://feeds.washingtonpost.com/rss/world",emitPlatform = "/news/"+washPostID,collectPlatform = "/news/"+washPostID,pollTime = 5000)))
+
+    val whiteOnRiceID = "whiteonrice"
+    val whiteOnRice = context.actorOf(Props(classOf[WhiteOnRiceNews], new NewsConfig(id=whiteOnRiceID,url="http://feeds.feedburner.com/worc",emitPlatform = "/news/"+whiteOnRiceID,collectPlatform = "/news/"+whiteOnRiceID,pollTime = 5000)))
   }
   
   

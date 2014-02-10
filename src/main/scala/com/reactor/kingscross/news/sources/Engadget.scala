@@ -19,21 +19,21 @@ import com.mongodb.casbah.MongoCollection
 import akka.actor.Props
 
 //================================================================================
-// 	TechCrunch
+// 	Engadget
 //  Notes: - abstract with Difbot
 //================================================================================
 
-class TechCrunchNews(config:NewsConfig)  extends News(config:NewsConfig) {
+class EngadgetNews(config:NewsConfig)  extends News(config:NewsConfig) {
   //Emitter
   val emitter = context.actorOf(Props(classOf[NewsEmitter], config))
   // Collector
-	val flowConfig = FlowControlConfig(name="techCrunchCollector", actorType="com.reactor.kingscross.news.sources.TechCrunchNewsCollector")
+	val flowConfig = FlowControlConfig(name="engadgetCollector", actorType="com.reactor.kingscross.news.sources.EngadgetNewsCollector")
 	val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
 
 }
 
 
-class TechCrunchNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
+class EngadgetNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
 
   var isDevChannel:Boolean = false
 
@@ -41,7 +41,7 @@ class TechCrunchNewsCollector(args:CollectorArgs) extends NewsCollector(args:Col
 
     //	Fill out preliminary News Story fields
 	  val story:NewsStory = parseEventData(event.data)
-	  story.source_id = "techcrunch"
+	  story.source_id = "engadget"
 	    
 	  
 	  //	TODO: Make a Mongo call only once a day - load data in an init method?
