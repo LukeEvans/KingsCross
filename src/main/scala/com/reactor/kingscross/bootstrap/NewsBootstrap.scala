@@ -16,6 +16,12 @@ import com.reactor.kingscross.news.sources._
 import com.reactor.kingscross.control.CollectorArgs
 import com.reactor.kingscross.control.StorerArgs
 import com.reactor.base.patterns.pull.FlowControlConfig
+import com.reactor.kingscross.control.CollectorArgs
+import com.reactor.kingscross.control.StorerArgs
+import com.reactor.base.patterns.pull.FlowControlConfig
+import com.reactor.kingscross.control.CollectorArgs
+import com.reactor.kingscross.control.StorerArgs
+import com.reactor.base.patterns.pull.FlowControlConfig
 
 class NewsBootstrap extends Actor with ActorLogging {
  
@@ -82,12 +88,30 @@ class NewsBootstrap extends Actor with ActorLogging {
    // val adventureBlogID = "advblog"
     //val adventureBlog = context.actorOf(Props(classOf[AdventureBlogNews], new NewsConfig(id=adventureBlogID,url="http://feeds.feedburner.com/theadventureblog?format=xml",emitPlatform = "/news/"+adventureBlogID,collectPlatform = "/news/"+adventureBlogID,pollTime = 5000)))
 
-    val incID = "inc"
-    val inc =  context.actorOf(Props(classOf[IncNews], new NewsConfig(id=incID,url="http://www.inc.com/rss/homepage.xml",emitPlatform = "/news/"+incID,collectPlatform = "/news/"+incID,pollTime = 5000)))
+    //val incID = "inc"
+    //val inc =  context.actorOf(Props(classOf[IncNews], new NewsConfig(id=incID,url="http://www.inc.com/rss/homepage.xml",emitPlatform = "/news/"+incID,collectPlatform = "/news/"+incID,pollTime = 5000)))
 
+    //val bbcScienceID = "bbc_science"
+    //val bbcScience = context.actorOf(Props(classOf[BBCScienceNews], new NewsConfig(id=bbcScienceID,url="http://feeds.bbci.co.uk/news/science_and_environment/rss.xml",emitPlatform = "/news/"+bbcScienceID,collectPlatform = "/news/"+bbcScienceID,pollTime = 5000)))
 
+    //val bbcEntertainmentID = "bbc_entertainment"
+    //val bbcEntertainment = context.actorOf(Props(classOf[BBCEntertainmentNews], new NewsConfig(id=bbcEntertainmentID,url="http://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml",emitPlatform = "/news/"+bbcEntertainmentID,collectPlatform = "/news/"+bbcEntertainmentID,pollTime = 5000)))
 
-    //val bbc = context.actorOf(Props(classOf[News], new NewsConfig(id="bbc-health", url="www.bbc-health.com", pollTime=1)))
+    //val bbcBusinessID = "bbc_business"
+    //val bbcBusiness = context.actorOf(Props(classOf[BBCBusinessNews], new NewsConfig(id=bbcBusinessID,url="http://feeds.bbci.co.uk/news/business/rss.xml",emitPlatform = "/news/"+bbcBusinessID,collectPlatform = "/news/"+bbcBusinessID,pollTime = 5000)))
+
+    //val bbcPoliticsID = "bbc_politics"
+    //val bbcPolitics = context.actorOf(Props(classOf[BBCPoliticsNews], new NewsConfig(id=bbcPoliticsID,url="http://feeds.bbci.co.uk/news/politics/rss.xml",emitPlatform = "/news/"+bbcPoliticsID,collectPlatform = "/news/"+bbcPoliticsID,pollTime = 5000)))
+
+    //val bbcHealthID = "bbc_health"
+    //val bbcHealth = context.actorOf(Props(classOf[BBCHealthNews], new NewsConfig(id=bbcHealthID,url="http://feeds.bbci.co.uk/news/health/rss.xml",emitPlatform = "/news/"+bbcHealthID,collectPlatform = "/news/"+bbcHealthID,pollTime = 5000)))
+
+    //val bbcEducationID = "bbc_education"
+    //val bbcEducation =  context.actorOf(Props(classOf[BBCEducationNews], new NewsConfig(id=bbcEducationID,url="http://feeds.bbci.co.uk/news/education/rss.xml",emitPlatform = "/news/"+bbcEducationID,collectPlatform = "/news/"+bbcEducationID,pollTime = 5000)))
+
+    val fashionologieID = "fashionologie"
+    val fashionologie = context.actorOf(Props(classOf[FashionologieNews], new NewsConfig(id=fashionologieID,url="http://www.fashionologie.com/posts/feed",emitPlatform = "/news/"+fashionologieID,collectPlatform = "/news/"+fashionologieID,pollTime = 5000)))
+
   }
   
   

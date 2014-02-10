@@ -20,7 +20,7 @@ import akka.actor.Props
 
 //================================================================================
 // 	NHL
-//  Notes: -  Abstract with Difbot
+//  Notes: -  Abstract with Difbot custom API for images
 //================================================================================
 
 class NhlNews(config:NewsConfig)  extends News(config:NewsConfig) {

@@ -19,21 +19,21 @@ import com.mongodb.casbah.MongoCollection
 import akka.actor.Props
 
 //================================================================================
-// 	The Wall Street Journal  - U.S. Business RSS Feed
-//  Notes:  - abstract with Difbot custom API for images
+// 	BBC Health
+//  Notes: - abstract with Difbot
 //================================================================================
 
-class WallStreetJournalNews(config:NewsConfig)  extends News(config:NewsConfig) {
+class BBCHealthNews(config:NewsConfig)  extends News(config:NewsConfig) {
   //Emitter
   val emitter = context.actorOf(Props(classOf[NewsEmitter], config))
   // Collector
-	val flowConfig = FlowControlConfig(name="wsjCollector", actorType="com.reactor.kingscross.news.sources.WallStreetJournalNewsCollector")
+	val flowConfig = FlowControlConfig(name="bbcHealthCollector", actorType="com.reactor.kingscross.news.sources.BBCHealthNewsCollector")
 	val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
 
 }
 
 
-class WallStreetJournalNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
+class BBCHealthNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
 
   var isDevChannel:Boolean = false
 
@@ -41,12 +41,12 @@ class WallStreetJournalNewsCollector(args:CollectorArgs) extends NewsCollector(a
 
     //	Fill out preliminary News Story fields
 	  val story:NewsStory = parseEventData(event.data)
-	  story.source_id = "wsj"
+	  story.source_id = "bbc_health"
 	    
 	  
 	  //	TODO: Make a Mongo call only once a day - load data in an init method?
     //	TODO: Load parameters from Mongo
-	  story.ceiling_topic = "business"
+	  story.ceiling_topic = "health"
 
 	  val channelCollection:MongoCollection = new MongoCollection(winstonDB.right.get.getCollection("winston-channels"))
 	  val query = MongoDBObject("db" -> story.source_id)
@@ -117,7 +117,7 @@ class WallStreetJournalNewsCollector(args:CollectorArgs) extends NewsCollector(a
             }
 
           case None =>
-            println("ERROR: channel entry for not found for "+story.source_id)
+            println("ERROR: channel entry not found for "+story.source_id)
             complete()
             return
 
@@ -176,7 +176,7 @@ class WallStreetJournalNewsCollector(args:CollectorArgs) extends NewsCollector(a
         story.related_topics = extractedTopics.relatedTopics
         story.main_topics = extractedTopics.mainTopics
 
-        story.valid = story.checkValid(true)
+        story.valid = story.checkValid(false)
 
         publishStory(story, isDevChannel)
 

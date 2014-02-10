@@ -20,7 +20,7 @@ import akka.actor.Props
 
 //================================================================================
 // 	The Adventure Blog
-//  Notes: - abstract with Difbot
+//  Notes: - abstract with Difbot custom API for image
 //================================================================================
 
 class AdventureBlogNews(config:NewsConfig)  extends News(config:NewsConfig) {
