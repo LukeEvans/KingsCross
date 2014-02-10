@@ -109,9 +109,14 @@ class NewsBootstrap extends Actor with ActorLogging {
     //val bbcEducationID = "bbc_education"
     //val bbcEducation =  context.actorOf(Props(classOf[BBCEducationNews], new NewsConfig(id=bbcEducationID,url="http://feeds.bbci.co.uk/news/education/rss.xml",emitPlatform = "/news/"+bbcEducationID,collectPlatform = "/news/"+bbcEducationID,pollTime = 5000)))
 
-    val fashionologieID = "fashionologie"
-    val fashionologie = context.actorOf(Props(classOf[FashionologieNews], new NewsConfig(id=fashionologieID,url="http://www.fashionologie.com/posts/feed",emitPlatform = "/news/"+fashionologieID,collectPlatform = "/news/"+fashionologieID,pollTime = 5000)))
+    //val fashionologieID = "fashionologie"
+    //val fashionologie = context.actorOf(Props(classOf[FashionologieNews], new NewsConfig(id=fashionologieID,url="http://www.fashionologie.com/posts/feed",emitPlatform = "/news/"+fashionologieID,collectPlatform = "/news/"+fashionologieID,pollTime = 5000)))
 
+    val vergeID = "the_verge"
+    val verge = context.actorOf(Props(classOf[VergeNews], new NewsConfig(id=vergeID,url="http://www.theverge.com/rss/index.xml",emitPlatform = "/news/"+vergeID,collectPlatform = "/news/"+vergeID,pollTime = 5000)))
+
+    val techcrunchID = "techcrunch"
+    val techcrunch = context.actorOf(Props(classOf[TechCrunchNews], new NewsConfig(id=techcrunchID,url="http://feeds.feedburner.com/TechCrunch/",emitPlatform = "/news/"+techcrunchID,collectPlatform = "/news/"+techcrunchID,pollTime = 5000)))
   }
   
   
