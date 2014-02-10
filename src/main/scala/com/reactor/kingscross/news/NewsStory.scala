@@ -64,7 +64,45 @@ class NewsStory {
   }
   
   def parseAbstraction(gooseResult:Abstraction, difbotResult:Abstraction) {
-	  // TODO !!!!
+
+    //  Get entites and text from Goose
+    full_text = StringEscapeUtils.unescapeHtml(gooseResult.text)
+    if(full_text != null) {
+      full_text = full_text.replaceAll("/n"," ")
+    }
+    else {
+      println("\nERROR - No full text found on abstraction\n")     // TODO handle error
+    }
+
+    if (gooseResult.entities != null && gooseResult.entities.size > 0) {
+      for (gooseEntity:Entity <- gooseResult.entities) {
+        if (!entities.contains(gooseEntity)) {
+          //  TOD merge entities of same name
+          entities += gooseEntity
+        }
+      }
+    }
+
+    //  Get images from Difbot
+
+
+
+    /*
+    images = diffbotAbstraction.images;
+
+    if(db.equals("cnn_politics")) {
+      ArrayList<String> temp = new ArrayList<String>(images);
+      for(String urlString : images) {
+        if (urlString.contains("_no_flash")) {
+          temp.remove(urlString);
+          logger.debug("CNN Flash Image Removed");
+        }
+      }
+      images = temp;
+    }
+
+  */
+
   }
   
   def buildSpeech():String = {

@@ -23,7 +23,6 @@ import org.apache.http.message.BasicNameValuePair
 import org.apache.http.client.entity.UrlEncodedFormEntity
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
-import org.apache.commons.io.output.ByteArrayOutputStream
 
 ;
 

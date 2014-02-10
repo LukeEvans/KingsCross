@@ -35,7 +35,7 @@ class Abstractor {
       val goose = new Goose(config)
 
       try {
-        val article: Article = goose.extractContent(url);
+        val article: Article = goose.extractContent(url)
         if (article == null) {
           println("Null article from Goose " + url)
           None
