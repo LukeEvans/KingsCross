@@ -1,0 +1,7 @@
+---
+
+- name: Pause
+  pause: seconds=60
+  
+- name: Run sbt dist
+  local_action: shell cd .. && sbt dist
