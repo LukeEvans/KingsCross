@@ -76,6 +76,7 @@ libraryDependencies += "org.jsoup" % "jsoup" % "1.7.2"
 
 libraryDependencies += "junit" % "junit" % "4.7"
 
+
 //libraryDependencies += "com.gravity" % "goose" % "2.1.22"
 
 

@@ -123,7 +123,7 @@ class JsoupAbstractor {
       }
     } catch {
       case e:Exception =>
-        println("\nJsoup failed to connect to " + url + " reason: " + e.getLocalizedMessage)
+        println("\nJsoup failed to connect to " + url + " reason: " + e.getMessage + " " + e.getCause)
         None
     }
   }

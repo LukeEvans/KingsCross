@@ -36,7 +36,7 @@ class NewsConfig() extends PollingConfig {
 	 store_platform = "store-" + storePlatform
 	 complete_platform = "complete-" + emitPlatform
 	 
-	 start_delay = Random.nextInt % 5
+	 start_delay = Random.nextInt % 30
 	 poll_time = pollTime
 	 
 	 source_id = id
