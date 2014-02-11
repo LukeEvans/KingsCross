@@ -1,5 +1,14 @@
+- name: Build New Dist
+  hosts: 
+  - local
+  user: ubuntu
+  sudo: true
+  gather_facts: false
+  roles:
+      - package
+
 - name: Deploy and run 
-  hosts: l
+  hosts: 
   - ec2_hosts
   user: ubuntu
   sudo: true

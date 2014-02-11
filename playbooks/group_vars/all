@@ -6,3 +6,6 @@ upstart_daemons:
 
 ec2_hosts:
   - tag_Name_KingsCross-01
+
+local:
+  - localhost
