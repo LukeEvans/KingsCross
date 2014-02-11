@@ -139,8 +139,24 @@ class NewsBootstrap extends Actor with ActorLogging {
     //val whiteOnRiceID = "whiteonrice"
     //val whiteOnRice = context.actorOf(Props(classOf[WhiteOnRiceNews], new NewsConfig(id=whiteOnRiceID,url="http://feeds.feedburner.com/worc",emitPlatform = "/news/"+whiteOnRiceID,collectPlatform = "/news/"+whiteOnRiceID,pollTime = 5000)))
 
-    val reutersPoliticsID = "reuters_politics"
-    val reutersPolitics = context.actorOf(Props(classOf[ReutersPoliticsNews], new NewsConfig(id=reutersPoliticsID,url="http://feeds.reuters.com/Reuters/PoliticsNews?format=xml",emitPlatform = "/news/"+reutersPoliticsID,collectPlatform = "/news/"+reutersPoliticsID,pollTime = 5000)))
+    //val reutersPoliticsID = "reuters_politics"
+    //val reutersPolitics = context.actorOf(Props(classOf[ReutersPoliticsNews], new NewsConfig(id=reutersPoliticsID,url="http://feeds.reuters.com/Reuters/PoliticsNews?format=xml",emitPlatform = "/news/"+reutersPoliticsID,collectPlatform = "/news/"+reutersPoliticsID,pollTime = 5000)))
+
+    //val reutersWorldID = "reuters_world"
+    //val reutersWorld = context.actorOf(Props(classOf[ReutersWorldNews], new NewsConfig(id=reutersWorldID,url="http://feeds.reuters.com/Reuters/worldNews?format=xml",emitPlatform = "/news/"+reutersWorldID,collectPlatform = "/news/"+reutersWorldID,pollTime = 5000)))
+
+    //val reutersEntertainmentID = "reuters_entertainment"
+    //val reutersEntertainment = context.actorOf(Props(classOf[ReutersEntertainmentNews], new NewsConfig(id=reutersEntertainmentID,url="http://feeds.reuters.com/reuters/entertainment?format=xml",emitPlatform = "/news/"+reutersEntertainmentID,collectPlatform = "/news/"+reutersEntertainmentID,pollTime = 5000)))
+
+    //val reutersTopID = "reuters_top"
+    //val reutersTop = context.actorOf(Props(classOf[ReutersTopNews], new NewsConfig(id=reutersTopID,url="http://feeds.reuters.com/reuters/topNews?format=xml",emitPlatform = "/news/"+reutersTopID,collectPlatform = "/news/"+reutersTopID,pollTime = 5000)))
+
+    val reutersBusinessID = "reuters_business"
+    val reutersBusiness = context.actorOf(Props(classOf[ReutersBusinessNews], new NewsConfig(id=reutersBusinessID,url="http://feeds.reuters.com/reuters/businessNews?format=xml",emitPlatform = "/news/"+reutersBusinessID,collectPlatform = "/news/"+reutersBusinessID,pollTime = 5000)))
+
+    val reutersLifestyleID = "reuters_lifestyle"
+    val reutersLifestyle = context.actorOf(Props(classOf[ReutersLifestyleNews], new NewsConfig(id=reutersLifestyleID,url="http://feeds.reuters.com/reuters/lifestyle?format=xml",emitPlatform = "/news/"+reutersLifestyleID,collectPlatform = "/news/"+reutersLifestyleID,pollTime = 5000)))
+
 
   }
   

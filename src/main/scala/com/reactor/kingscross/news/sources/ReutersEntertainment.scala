@@ -1,36 +1,35 @@
 package com.reactor.kingscross.news.sources
 
-import com.reactor.kingscross.control.EmitEvent
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.JsonNode
-import com.reactor.kingscross.config.NewsConfig
-import com.reactor.base.patterns.pull.FlowControlFactory
 import com.reactor.kingscross.news._
 import com.mongodb.casbah.commons.MongoDBObject
 import com.mongodb.DBObject
 import com.mongodb.casbah.MongoCollection
-import akka.actor.Props
 import com.reactor.kingscross.control.CollectorArgs
 import com.reactor.kingscross.control.EmitEvent
-import com.reactor.base.patterns.pull.FlowControlConfig
 import scala.Some
+import com.reactor.kingscross.config.NewsConfig
+import akka.actor.Props
+import com.reactor.base.patterns.pull.{FlowControlFactory, FlowControlConfig}
 
 //================================================================================
-// 	Reuters Politics
+// 	Reuters Entertainment
 //  Notes: - abstract with Difbot, get text with Jsoup
 //================================================================================
 
-class ReutersPoliticsNews(config:NewsConfig)  extends News(config:NewsConfig) {
+class ReutersEntertainmentNews(config:NewsConfig)  extends News(config:NewsConfig) {
   //Emitter
   val emitter = context.actorOf(Props(classOf[NewsEmitter], config))
   // Collector
-	val flowConfig = FlowControlConfig(name="reutersPoliticsCollector", actorType="com.reactor.kingscross.news.sources.ReutersPoliticsNewsCollector")
-	val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
+  val flowConfig = FlowControlConfig(name="reutersEntertainmentCollector", actorType="com.reactor.kingscross.news.sources.ReutersEntertainmentNewsCollector")
+  val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
 
 }
 
 
-class ReutersPoliticsNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
+
+class ReutersEntertainmentNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
 
   var isDevChannel:Boolean = false
 
@@ -38,12 +37,12 @@ class ReutersPoliticsNewsCollector(args:CollectorArgs) extends NewsCollector(arg
 
     //	Fill out preliminary News Story fields
 	  val story:NewsStory = parseEventData(event.data)
-	  story.source_id = "reuters_politics"
+	  story.source_id = "reuters_entertainment"
 	    
 	  
 	  //	TODO: Make a Mongo call only once a day - load data in an init method?
     //	TODO: Load parameters from Mongo
-	  story.ceiling_topic = "politics"
+	  story.ceiling_topic = "entertainment"
 
 	  val channelCollection:MongoCollection = new MongoCollection(winstonDB.right.get.getCollection("winston-channels"))
 	  val query = MongoDBObject("db" -> story.source_id)
