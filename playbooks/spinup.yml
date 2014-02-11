@@ -5,8 +5,8 @@
   gather_facts: false
 
   vars:
-    keypair: KingsCross
-    security_group: KC
+    keypair: KC
+    security_group: KingsCross
 
     # Instace types
     instance_type: m1.large
