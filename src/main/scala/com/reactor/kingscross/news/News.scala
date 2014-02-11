@@ -166,6 +166,11 @@ class NewsCollector(args: CollectorArgs) extends Collector(args) {
     abstractor.getGooseAbstraction(url)
   }
 
+  def getTextFromJsoup(url:String, rules:ExtractionRules):Option[String] = {
+    val jsoupAbstractor = new JsoupAbstractor
+    jsoupAbstractor.getText(url,rules)
+  }
+
   def getSummary(headline: String, fullText: String): String = {
 
     if (fullText == null | fullText.equals("")) {

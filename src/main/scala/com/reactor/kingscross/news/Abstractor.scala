@@ -183,7 +183,8 @@ class Abstractor {
 
 
   def isValidImageLink(url: String): Boolean = {
-    if (url.contains(".jpeg") || url.contains(".jpg") || url.contains(".png") || url.contains(".yimg")) {
+    //  TODO do we need to make this source specific?
+    if (url.contains(".jpeg") || url.contains(".jpg") || url.contains(".png") || url.contains(".yimg") || url.contains("reutersmedia")) {
       true
     }
     else {

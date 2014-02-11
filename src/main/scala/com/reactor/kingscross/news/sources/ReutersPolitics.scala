@@ -1,52 +1,49 @@
 package com.reactor.kingscross.news.sources
 
-import com.reactor.kingscross.control.{CollectorArgs, EmitEvent}
+import com.reactor.kingscross.control.EmitEvent
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.JsonNode
 import com.reactor.kingscross.config.NewsConfig
-import com.reactor.base.patterns.pull.FlowControlConfig
 import com.reactor.base.patterns.pull.FlowControlFactory
-import com.reactor.kingscross.news.Abstraction
-import com.reactor.kingscross.news.Entity
-import com.reactor.kingscross.news.News
-import com.reactor.kingscross.news.NewsEmitter
-import com.reactor.kingscross.news.NewsCollector
-import com.reactor.kingscross.news.NewsStory
-import com.reactor.kingscross.news.TopicSet
+import com.reactor.kingscross.news._
 import com.mongodb.casbah.commons.MongoDBObject
 import com.mongodb.DBObject
 import com.mongodb.casbah.MongoCollection
 import akka.actor.Props
+import com.reactor.kingscross.control.CollectorArgs
+import com.reactor.kingscross.control.EmitEvent
+import com.reactor.base.patterns.pull.FlowControlConfig
+import scala.Some
 
 //================================================================================
-// 	The Atlantic
-//  Notes: - abstract with Difbot
+// 	Reuters Politics
+//  Notes: - abstract with Difbot, get text with Jsoup
 //================================================================================
 
-class AtlanticNews(config:NewsConfig)  extends News(config:NewsConfig) {
+class ReutersPoliticsNews(config:NewsConfig)  extends News(config:NewsConfig) {
   //Emitter
   val emitter = context.actorOf(Props(classOf[NewsEmitter], config))
   // Collector
-	val flowConfig = FlowControlConfig(name="atlanticCollector", actorType="com.reactor.kingscross.news.sources.AtlanticNewsCollector")
+	val flowConfig = FlowControlConfig(name="reutersPoliticsCollector", actorType="com.reactor.kingscross.news.sources.ReutersPoliticsNewsCollector")
 	val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
 
 }
-  
-  
-class AtlanticNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
 
-  var isDevChannel:Boolean = false
+
+class ReutersPoliticsNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
+
+  var isDevChannel:Boolean = true
 
   override def handleEvent(event:EmitEvent) {
 
     //	Fill out preliminary News Story fields
 	  val story:NewsStory = parseEventData(event.data)
-	  story.source_id = "atlantic"
+	  story.source_id = "reuters_politics"
 	    
 	  
 	  //	TODO: Make a Mongo call only once a day - load data in an init method?
     //	TODO: Load parameters from Mongo
-	  story.ceiling_topic = "all_topics"
+	  story.ceiling_topic = "politics"
 
 	  val channelCollection:MongoCollection = new MongoCollection(winstonDB.right.get.getCollection("winston-channels"))
 	  val query = MongoDBObject("db" -> story.source_id)
@@ -162,6 +159,16 @@ class AtlanticNewsCollector(args:CollectorArgs) extends NewsCollector(args:Colle
         story.parseAbstraction(difbotAbstraction)
         story.speech = story.buildSpeech()
 
+        //  Use Jsoup to find the full text
+        story.full_text = getTextFromJsoup(story.link,new ExtractionRules("id", "articleText", List())) match {
+          case Some(s:String) =>
+            println("Jsoup text abstraction succeeded")
+            s
+          case None =>
+            println("Jsoup text abstraction failed")
+            story.full_text
+        }
+
         story.summary = getSummary(story.headline,story.full_text)
         story.speech = story.summary // TODO lots going on with speech field, can we simplify?
 
@@ -169,7 +176,9 @@ class AtlanticNewsCollector(args:CollectorArgs) extends NewsCollector(args:Colle
           case Some(newSpeech:String) => newSpeech
           case None => story.speech
         }
-        story.full_text = scrubFullText(story.full_text)  // TODO should we be scrubbing the summary too?
+
+        story.full_text = scrubFullText(story.full_text)
+
 
         //	Topic Extraction
         val extractedTopics:TopicSet = getTopics(story)

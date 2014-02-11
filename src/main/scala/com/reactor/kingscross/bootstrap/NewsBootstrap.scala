@@ -133,11 +133,15 @@ class NewsBootstrap extends Actor with ActorLogging {
     //val guardianID = "guardian"
     //val guardian = context.actorOf(Props(classOf[GuardianNews], new NewsConfig(id=guardianID,url="http://feeds.guardian.co.uk/theguardian/us-home/rss",emitPlatform = "/news/"+guardianID,collectPlatform = "/news/"+guardianID,pollTime = 5000)))
 
-    val washPostID = "washpost_world"
-    val washPost = context.actorOf(Props(classOf[WashingtonPostNews], new NewsConfig(id=washPostID,url="http://feeds.washingtonpost.com/rss/world",emitPlatform = "/news/"+washPostID,collectPlatform = "/news/"+washPostID,pollTime = 5000)))
+    //val washPostID = "washpost_world"
+    //val washPost = context.actorOf(Props(classOf[WashingtonPostNews], new NewsConfig(id=washPostID,url="http://feeds.washingtonpost.com/rss/world",emitPlatform = "/news/"+washPostID,collectPlatform = "/news/"+washPostID,pollTime = 5000)))
 
-    val whiteOnRiceID = "whiteonrice"
-    val whiteOnRice = context.actorOf(Props(classOf[WhiteOnRiceNews], new NewsConfig(id=whiteOnRiceID,url="http://feeds.feedburner.com/worc",emitPlatform = "/news/"+whiteOnRiceID,collectPlatform = "/news/"+whiteOnRiceID,pollTime = 5000)))
+    //val whiteOnRiceID = "whiteonrice"
+    //val whiteOnRice = context.actorOf(Props(classOf[WhiteOnRiceNews], new NewsConfig(id=whiteOnRiceID,url="http://feeds.feedburner.com/worc",emitPlatform = "/news/"+whiteOnRiceID,collectPlatform = "/news/"+whiteOnRiceID,pollTime = 5000)))
+
+    val reutersPoliticsID = "reuters_politics"
+    val reutersPolitics = context.actorOf(Props(classOf[ReutersPoliticsNews], new NewsConfig(id=reutersPoliticsID,url="http://feeds.reuters.com/Reuters/PoliticsNews?format=xml",emitPlatform = "/news/"+reutersPoliticsID,collectPlatform = "/news/"+reutersPoliticsID,pollTime = 5000)))
+
   }
   
   
