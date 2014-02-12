@@ -20,7 +20,7 @@ class Scrubber {
         case None => None
         case Some(scrubData:JsonNode) =>
           if(!scrubData.isArray) {
-            None
+            return None
           }
 
           var cleanSpeech:String = clean(dirtySpeech)
@@ -59,7 +59,7 @@ class Scrubber {
   private def clean(s:String):String = {
 
     if(s == null || s.equals("")) {
-      null
+      return null
     }
 
     var cleanString:String = s.replaceAll("\\<.*?\\>", " ")
