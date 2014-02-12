@@ -29,6 +29,7 @@ import com.reactor.kingscross.control.CollectorArgs
 import com.reactor.kingscross.control.StorerArgs
 import com.reactor.base.patterns.pull.FlowControlConfig
 
+
 class NewsBootstrap extends Actor with ActorLogging {
  
   // Init
@@ -185,10 +186,15 @@ class NewsBootstrap extends Actor with ActorLogging {
 //
 //    val nprWorldID = "wld"
 //    val nprWorld = context.actorOf(Props(classOf[NPRWorldNews], new NewsConfig(id=nprWorldID,url="http://www.npr.org/rss/rss.php?id=1004",emitPlatform = "/news/"+nprWorldID,collectPlatform = "/news/"+nprWorldID,pollTime = standardPollTime)))
-////
-    val nprEntertainmentID = "ent"
-    val nprEntertainment = context.actorOf(Props(classOf[NPREntertainmentNews], new NewsConfig(id=nprEntertainmentID,url="http://www.npr.org/rss/rss.php?id=1048",emitPlatform = "/news/"+nprEntertainmentID,collectPlatform = "/news/"+nprEntertainmentID,pollTime = standardPollTime)))
 //
+//    val nprEntertainmentID = "ent"
+//    val nprEntertainment = context.actorOf(Props(classOf[NPREntertainmentNews], new NewsConfig(id=nprEntertainmentID,url="http://www.npr.org/rss/rss.php?id=1048",emitPlatform = "/news/"+nprEntertainmentID,collectPlatform = "/news/"+nprEntertainmentID,pollTime = standardPollTime)))
+
+    val foxWorldID = "fox_news_world"
+    val foxWorld = context.actorOf(Props(classOf[FoxWorldNews], new NewsConfig(id=foxWorldID,url="http://feeds.foxnews.com/foxnews/world?format=xml",emitPlatform = "/news/"+foxWorldID,collectPlatform = "/news/"+foxWorldID,pollTime = standardPollTime)))
+
+    val foxPoliticsID = "fox_news_politics"
+    val foxPolitics = context.actorOf(Props(classOf[FoxPoliticsNews], new NewsConfig(id=foxPoliticsID,url="http://feeds.foxnews.com/foxnews/politics?format=xml",emitPlatform = "/news/"+foxPoliticsID,collectPlatform = "/news/"+foxPoliticsID,pollTime = standardPollTime)))
 
   }
   

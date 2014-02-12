@@ -125,6 +125,7 @@ object Tools {
 
     try {
       val httpClient: DefaultHttpClient = new DefaultHttpClient()
+      httpClient.getParams.setParameter("http.socket.timeout", new Integer(40000))
       val postRequest: HttpPost = new HttpPost(url)
       val mapper: ObjectMapper = new ObjectMapper()
       val jsonString: String = mapper.writeValueAsString(body)
@@ -136,12 +137,32 @@ object Tools {
 
       val reader: BufferedReader = new BufferedReader(new InputStreamReader(response.getEntity.getContent, "UTF-8"))
       val json: String = reader.readLine
-      Some(mapper.readTree(json))
-
+      if (json == null || json.equals("")) {
+        println("\nERROR: null response from " + url)
+        None
+      }
+      else {
+        val n:JsonNode = mapper.readTree(json)
+        if (n == null) {
+          println("\nCan't create Json Node from this string = " +json)
+          None
+        }
+        else {
+          Some(n)
+        }
+      }
     } catch {
-      case e: Exception => e.printStackTrace()
+      case e:NullPointerException =>
+        var subURL = url
+        if (subURL.length>200) {
+          subURL = subURL.substring(0,200)
+        }
+        println("\nERROR: Null pointer exception in response from " + subURL)
+        None
+      case e: Exception =>
+        e.printStackTrace()
+        None
     }
-    None
   }
 
   def fetchURL(url: String):Option[JsonNode] = {
@@ -157,7 +178,13 @@ object Tools {
       val mapper = new ObjectMapper()
       val reader = new BufferedReader(new InputStreamReader(response.getEntity.getContent, "UTF-8"))
 
-      Some(mapper.readTree(reader))
+      val n:JsonNode = mapper.readTree(reader)
+      if (n != null) {
+        Some(n)
+      }
+      else{
+        None
+      }
 
     } catch {
       case e: Exception =>

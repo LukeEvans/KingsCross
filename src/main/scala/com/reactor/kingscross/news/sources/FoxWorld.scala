@@ -1,6 +1,6 @@
-package com.reactor.kingscross.news.copy
+package com.reactor.kingscross.news.sources
 
-import com.reactor.kingscross.control.{CollectorArgs, EmitEvent}
+import com.reactor.kingscross.control.EmitEvent
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.JsonNode
 import com.reactor.kingscross.config.NewsConfig
@@ -18,7 +18,7 @@ import scala.Some
 
 //================================================================================
 // 	Fox World
-//  Notes:
+//  Notes: uses difbot for extraction and Wikipedia image solution for images
 //================================================================================
 
 class FoxWorldNews(config:NewsConfig)  extends News(config:NewsConfig) {
@@ -33,7 +33,7 @@ class FoxWorldNews(config:NewsConfig)  extends News(config:NewsConfig) {
 
 class FoxWorldNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
 
-  var isDevChannel:Boolean = true
+  var isDevChannel:Boolean = false
 
   override def handleEvent(event:EmitEvent) {
 
