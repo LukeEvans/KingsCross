@@ -189,12 +189,16 @@ class NewsBootstrap extends Actor with ActorLogging {
 //
 //    val nprEntertainmentID = "ent"
 //    val nprEntertainment = context.actorOf(Props(classOf[NPREntertainmentNews], new NewsConfig(id=nprEntertainmentID,url="http://www.npr.org/rss/rss.php?id=1048",emitPlatform = "/news/"+nprEntertainmentID,collectPlatform = "/news/"+nprEntertainmentID,pollTime = standardPollTime)))
+//
+//    val foxWorldID = "fox_news_world"
+//    val foxWorld = context.actorOf(Props(classOf[FoxWorldNews], new NewsConfig(id=foxWorldID,url="http://feeds.foxnews.com/foxnews/world?format=xml",emitPlatform = "/news/"+foxWorldID,collectPlatform = "/news/"+foxWorldID,pollTime = standardPollTime)))
+//
+//    val foxPoliticsID = "fox_news_politics"
+//    val foxPolitics = context.actorOf(Props(classOf[FoxPoliticsNews], new NewsConfig(id=foxPoliticsID,url="http://feeds.foxnews.com/foxnews/politics?format=xml",emitPlatform = "/news/"+foxPoliticsID,collectPlatform = "/news/"+foxPoliticsID,pollTime = standardPollTime)))
 
-    val foxWorldID = "fox_news_world"
-    val foxWorld = context.actorOf(Props(classOf[FoxWorldNews], new NewsConfig(id=foxWorldID,url="http://feeds.foxnews.com/foxnews/world?format=xml",emitPlatform = "/news/"+foxWorldID,collectPlatform = "/news/"+foxWorldID,pollTime = standardPollTime)))
+    val natGeoID = "national_geographic_news"
+    val natGeo = context.actorOf(Props(classOf[NationalGeographicNews], new NewsConfig(id=natGeoID,url="http://feeds.nationalgeographic.com/ng/News/News_Main?format=xml",emitPlatform = "/news/"+natGeoID,collectPlatform = "/news/"+natGeoID,pollTime = standardPollTime)))
 
-    val foxPoliticsID = "fox_news_politics"
-    val foxPolitics = context.actorOf(Props(classOf[FoxPoliticsNews], new NewsConfig(id=foxPoliticsID,url="http://feeds.foxnews.com/foxnews/politics?format=xml",emitPlatform = "/news/"+foxPoliticsID,collectPlatform = "/news/"+foxPoliticsID,pollTime = standardPollTime)))
 
   }
   
