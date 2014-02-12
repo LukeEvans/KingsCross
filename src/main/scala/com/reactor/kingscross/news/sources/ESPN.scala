@@ -6,21 +6,16 @@ import com.fasterxml.jackson.databind.{ObjectMapper, JsonNode}
 import com.reactor.kingscross.config.NewsConfig
 import com.reactor.base.patterns.pull.FlowControlConfig
 import com.reactor.base.patterns.pull.FlowControlFactory
-import com.reactor.kingscross.news.Abstraction
 import com.reactor.kingscross.news.Entity
 import com.reactor.kingscross.news.News
 import com.reactor.kingscross.news.NewsEmitter
 import com.reactor.kingscross.news.NewsCollector
 import com.reactor.kingscross.news.NewsStory
 import com.reactor.kingscross.news.TopicSet
-import com.mongodb.casbah.commons.MongoDBObject
-import com.mongodb.DBObject
-import com.mongodb.casbah.MongoCollection
 import akka.actor.Props
 import com.reactor.base.utilities.Tools
 import scala.collection.JavaConverters.mapAsJavaMapConverter
 import java.text.SimpleDateFormat
-import java.util.Date
 
 //================================================================================
 // 	ESPN
@@ -73,14 +68,18 @@ class ESPNNewsEmitter(config:NewsConfig) extends NewsEmitter(config:NewsConfig) 
 
 class ESPNNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
 
-  var isDevChannel:Boolean = false
+  val allowFirstPersonSpeech:Boolean = false
+  val isDevChannel:Boolean = false
 
   override def handleEvent(event:EmitEvent) {
 
     //	Fill out preliminary News Story fields
-	  val story:NewsStory = new NewsStory()
+	  var story:NewsStory = new NewsStory()
 
     story.story_type = "News"
+
+    story = addChannelInfo(story)
+
     story.pubdate = event.data.path("espn_pubdate").asText()
     val dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'")
     story.date = dateFormat.parse(story.pubdate)
@@ -92,90 +91,6 @@ class ESPNNewsCollector(args:CollectorArgs) extends NewsCollector(args:Collector
     story.summary = event.data.path("espn_description").asText()
     story.link = event.data.path("espn_url").asText()
 
-    story.source_id = "espn"
-	    
-	  
-	  //	TODO: Make a Mongo call only once a day - load data in an init method?
-    //	TODO: Load parameters from Mongo
-	  story.ceiling_topic = "sports"
-
-	  val channelCollection:MongoCollection = new MongoCollection(winstonDB.right.get.getCollection("winston-channels"))
-	  val query = MongoDBObject("db" -> story.source_id)
-	  channelCollection.findOne(query) match {
-      case Some(x:DBObject) =>
-        val channel = new MongoDBObject(x)
-        channel.getAs[String]("img") match {
-          case Some(link:String) => story.source_icon_link = link
-          case None =>
-            //	Story is invalid, stop execution
-            println("Story is invalid, no source link found")
-            complete()
-            return
-        }
-
-
-        channel.getAs[String]("name") match {
-          case Some(name:String) => story.source_name = name
-          case None =>
-            //	Story is invalid, stop execution
-            println("Story is invalid, no source name found")
-            complete()
-            return
-        }
-
-        channel.getAs[String]("category") match {
-          case Some(s:String) => story.source_category = s
-          case None => println("WARNING: Category channel field missing for " + story.source_id)
-        }
-
-        channel.getAs[String]("twitter_handle") match {
-          case Some(s:String) => story.source_twitter_handle = s
-          case None => println("WARNING: twitter handle channel field missing for "+story.source_id)
-        }
-
-      case None =>
-        //	Check for channel from dev channel list
-        val channelCollection:MongoCollection = new MongoCollection(winstonDB.right.get.getCollection("winston-channels-development"))
-	      val query = MongoDBObject("db" -> story.source_id)
-
-        channelCollection.findOne(query) match {
-          case Some(x:DBObject) =>
-            val channel = new MongoDBObject(x)
-            channel.getAs[String]("img") match {
-              case Some(link:String) => story.source_icon_link = link
-              case None =>
-                //	Story is invalid, stop execution
-                println("Story is invalid, no source link found")
-                complete()
-                return
-            }
-
-            channel.getAs[String]("name") match {
-              case Some(name:String) => story.source_name = name
-              case None =>
-                //	Story is invalid, stop execution
-                println("Story is invalid, no source name found")
-                complete()
-                return
-            }
-            channel.getAs[String]("category") match {
-              case Some(s:String) => story.source_category = s
-              case None => println("WARNING: Category channel field missing for "+story.source_id)
-            }
-            channel.getAs[String]("twitter_handle") match {
-              case Some(s:String) => story.source_twitter_handle = s
-              case None => println("WARNING: twitter handle channel field missing for "+story.source_id)
-            }
-
-          case None =>
-            println("ERROR: channel entry not found for "+story.source_id)
-            complete()
-            return
-
-        }
-    }
-
-    
 	  //	Add Categories as entities
     val mapper = new ObjectMapper()
 	  val jsonData:String = event.data.path("espn_entities").asText
@@ -187,10 +102,8 @@ class ESPNNewsCollector(args:CollectorArgs) extends NewsCollector(args:Collector
         if (categories.asInstanceOf[JsonNode].isArray) {
           for( a <- 0 until categories.asInstanceOf[ArrayNode].size()) {
             val category:String = categories.asInstanceOf[ArrayNode].get(a).toString
-            if (shouldAddEntity(category)) {
-              val entity = new Entity(category)
-              story.entities += entity
-            }
+            val entity = new Entity(category)
+            story.entities += entity
           }
         }
       }
@@ -226,35 +139,31 @@ class ESPNNewsCollector(args:CollectorArgs) extends NewsCollector(args:Collector
     } */
 
     //story.summary = getSummary(story.headline,story.full_text)
+
+   // Post Processing
     story.speech = scrubSpeech(story.speech) match {
       case Some(newSpeech:String) => newSpeech
       case None => story.speech
     }
     story.full_text = scrubFullText(story.full_text)  // TODO should we be scrubbing the summary too?
+    story.entities = removeBadEntities(story.entities)
 
     //	Topic Extraction
     val extractedTopics:TopicSet = getTopics(story)
     story.related_topics = extractedTopics.relatedTopics
     story.main_topics = extractedTopics.mainTopics
 
-    story.valid = story.checkValid(false)
+    story.valid = story.checkValid(allowFirstPersonSpeech)
 
     publishStory(story, isDevChannel)
 
     // Completed Event
     complete()
-
-
-
-
-
-
-
-
-
   }
 
   //	Filter out bad source-specific entities
-  def shouldAddEntity(entity:String):Boolean = true
+  def removeBadEntities(dirtyEnt:Set[Entity]):Set[Entity] = {
+    dirtyEnt
+  }
 }
 

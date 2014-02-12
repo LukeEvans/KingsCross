@@ -93,31 +93,31 @@ class Abstractor {
           var data = new Abstraction()
 
           val titleNode = difbotResult.get("title")
-          if (titleNode == null || !titleNode.isTextual) {
-            None
+          if (titleNode == null || titleNode.isMissingNode) {
+            return None
           }
 
           val textNode = difbotResult.get("text")
-          if (textNode == null || !textNode.isTextual) {
-            None
+          if (textNode == null || textNode.isMissingNode) {
+            return None
           }
 
           val urlNode = difbotResult.get("url")
-          if (urlNode == null || urlNode.isTextual) {
-            None
+          if (urlNode == null || urlNode.isMissingNode) {
+            return None
           }
 
           clean(titleNode.asText) match {
             case Some(s: String) => data.title = s
             case None =>
               println("ERROR: Bad Abstraction, missing title")
-              None
+              return None
           }
           clean(textNode.asText) match {
             case Some(s: String) => data.text = s
             case None =>
               println("ERROR: Bad Abstraction, missing text")
-              None
+              return None
           }
           data.url = urlNode.asText()
 

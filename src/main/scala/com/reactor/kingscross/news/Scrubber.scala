@@ -58,7 +58,7 @@ class Scrubber {
   
   private def clean(s:String):String = {
 
-    if(s == null) {
+    if(s == null || s.equals("")) {
       null
     }
 
