@@ -1,0 +1,10 @@
+---
+
+- name: Pause
+  pause: seconds=60
+
+- name: Kill previous runs
+  command: stop {{ item }}
+  with_items:
+     - ${upstart_daemons}
+  ignore_errors: yes

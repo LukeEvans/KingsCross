@@ -1,76 +1,8 @@
----
-
-- name: Package Project
-  hosts: localhost
-  user: root
+- name: Build New Dist
+  hosts: local
+  connection: local
+  user: ubuntu
+  sudo: true
   gather_facts: false
-
-  vars:
-
-    # Parallelization Hints
-    default_parallelization: 2
-    score_parallelization: 1
-    parse_parallelization: 1
-
-    # Roles
-    worker_role: reducto-worker
-    parser_role: reducto-parser
-    supervisor_role: reducto-supervisor
-
-    # Minimum Role instances
-    min_number: 1
-    min_frontend: 1
-
-    # Seed node ip
-    seed_ip: 10.180.206.175
-   
-    # Redis address
-    redis_address : "reducto-words.1hm814.0001.use1.cache.amazonaws.com"
-
-  tasks:
-
-    # API Boot
-    - name: Modify Worker Role name
-      local_action: lineinfile dest=../src/main/scala/com/winston/api/ApiBoot.scala regexp='^\s*val worker_role' line='          val worker_role = "{{worker_role}}"'
-
-    - name: Modify Parser Role name
-      local_action: lineinfile dest=../src/main/scala/com/winston/api/ApiBoot.scala regexp='^\s*val parser_role' line='          val parser_role = "{{parser_role}}"'
-
-    - name: Modify Supervisor Role name
-      local_action: lineinfile dest=../src/main/scala/com/winston/api/ApiBoot.scala regexp='^\s*val supervisor_role' line='          val supervisor_role = "{{supervisor_role}}"'      
-
-    - name: Modify default parallelization  
-      local_action: lineinfile dest=../src/main/scala/com/winston/api/ApiBoot.scala regexp='^\s*val default_parallelization' line='          val default_parallelization = {{default_parallelization}}'
-
-    - name: Modify search parallelization  
-      local_action: lineinfile dest=../src/main/scala/com/winston/api/ApiBoot.scala regexp='^\s*val score_parallelization' line='          val score_parallelization = {{score_parallelization}}'
-
-    - name: Modify parse parallelization
-      local_action: lineinfile dest=../src/main/scala/com/winston/api/ApiBoot.scala regexp='^\s*val parse_parallelization' line='          val parse_parallelization = {{parse_parallelization}}'
-
-    # Redis
-    - name: Point to redis machine
-      local_action: lineinfile dest=../src/main/scala/com/winston/nlp/search/RedisSearchActor.scala regexp='^\s*val jedis =' line='val jedis = new Jedis("{{redis_address}}");'
-
-    # Reducto Config
-    - name: Modify min number of roles
-      local_action: lineinfile dest=../src/main/resources/reducto.conf regexp='^#?akka.cluster.min' line='akka.cluster.min-nr-of-members = {{min_number}}'
-
-    - name: Modify min frontend 
-      local_action: lineinfile dest=../src/main/resources/reducto.conf regexp='^\s*#?reducto-frontend.min' line='  reducto-frontend.min-nr-of-members = {{min_frontend}}'
-
-
-    # Application Config
-    - name: Modify seed node
-      local_action: lineinfile dest=../src/main/resources/application.conf regexp='^\s*seed-nodes =' line='    seed-nodes = ["akka.tcp://NLPClusterSystem-0-1@{{seed_ip}}:2551"]'
-
-
-    # Remove old distribution
-    - name: Remove old distribution
-      local_action: shell rm -r ../target/reducto-dist
-      ignore_errors: yes
-   
-    # Run dist
-    - name: Run sbt dist
-      local_action: shell cd .. && sbt dist
-
+  roles:
+      - package

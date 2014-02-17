@@ -1,0 +1,15 @@
+---
+
+- name: Pause
+  pause: seconds=60
+
+- name: Remove old Dist
+  command: rm -rf /usr/local/{{ item }}
+  with_items:
+     - ${dist_name}
+  ignore_errors: yes
+  
+- name: Copy project Dist
+  copy: src=../target/{{ item }} dest=/usr/local/
+  with_items:
+     - ${dist_name}

@@ -1,0 +1,22 @@
+---
+
+- name: Pause
+  pause: seconds=60
+
+- name: Install wget package
+  command: apt-get install -y wget
+
+- name: Update apt cache
+  command: apt-get update
+
+- name: Pause
+  pause: seconds=5
+
+- name: Install unzip package
+  command: apt-get install -y unzip
+
+- name: Modify hard and soft ulimits
+  lineinfile: dest=/etc/security/limits.conf  regexp='^' line='ubuntu           {item}    nofile          65500' state=present
+  with_items:
+    - "soft"
+    - "hard"

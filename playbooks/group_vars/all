@@ -1,0 +1,11 @@
+dist_name:
+  - kingscross-dist
+
+upstart_daemons:
+  - KingsCross
+
+ec2_hosts:
+  - tag_Name_KingsCross-01
+
+local:
+  - localhost

@@ -1,0 +1,9 @@
+---
+
+- name: Pause
+  pause: seconds=60
+  
+- name: Run Daemon
+  command: "start {{ item }}"
+  with_items:
+     - ${upstart_daemons}
