@@ -6,4 +6,4 @@
 - name: Run Daemon
   command: "start {{ item }}"
   with_items:
-     - upstart_daemons
+     - ${upstart_daemons}

@@ -1,6 +1,6 @@
 - name: Deploy and run 
   hosts: 
-  - tag_Name_KingsCross-01
+  - ${ec2_hosts}
   user: ubuntu
   sudo: true
   gather_facts: false

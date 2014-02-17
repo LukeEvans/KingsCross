@@ -6,5 +6,5 @@
 - name: Kill previous runs
   command: stop {{ item }}
   with_items:
-     - upstart_daemons
+     - ${upstart_daemons}
   ignore_errors: yes
