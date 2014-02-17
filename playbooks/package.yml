@@ -1,5 +1,6 @@
 - name: Build New Dist
   hosts: local
+  connection: local
   user: ubuntu
   sudo: true
   gather_facts: false
