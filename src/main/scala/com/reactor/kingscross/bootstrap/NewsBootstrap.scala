@@ -209,6 +209,7 @@ class NewsBootstrap extends Actor with ActorLogging {
 
     val yahooSportsNhlID = "yahoosports_nhl"
     val yahooSportsNhl = context.actorOf(Props(classOf[YahooSportsNhlNews], new NewsConfig(id=yahooSportsNhlID,url="http://sports.yahoo.com/nhl/rss.xml",emitPlatform="/news/"+yahooSportsNhlID,collectPlatform = "/news/"+yahooSportsNhlID,pollTime = standardPollTime)))
+
   }
   
 

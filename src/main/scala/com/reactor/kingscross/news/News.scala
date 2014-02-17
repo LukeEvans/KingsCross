@@ -53,6 +53,7 @@ class News(config: NewsConfig) extends Actor {
 // Fetch news from RSS
 class NewsEmitter(config: NewsConfig) extends Emitter(config) {
 
+  println("\n\nStarting emitter for " + config.source_id + "\n\n")
 
   def handleEvent() {
     println("News emitter handle event for " + config.source_id + " from url " + config.source_url)

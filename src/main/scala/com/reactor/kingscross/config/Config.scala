@@ -36,7 +36,9 @@ class NewsConfig() extends PollingConfig {
 	 store_platform = "store-" + storePlatform
 	 complete_platform = "complete-" + emitPlatform
 	 
-	 start_delay = Random.nextInt % 30
+	 start_delay = math.abs(Random.nextInt % 30)
+     //start_delay = 1
+    if (start_delay == 0) { start_delay = 1 }
 	 poll_time = pollTime
 	 
 	 source_id = id
@@ -54,6 +56,7 @@ class TwitterConfig() extends PollingConfig {
 	 complete_platform = "complete-" + emitPlatform
 	 
 	 start_delay = Random.nextInt % 5
+
 	 poll_time = pollTime
   }  
 }
