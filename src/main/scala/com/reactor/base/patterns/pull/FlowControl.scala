@@ -10,7 +10,7 @@ import akka.actor.ActorLogging
 import com.reactor.base.patterns.pull.MasterWorkerProtocol._
 import akka.actor.ActorContext
 
-abstract class FlowControlArgs() {
+class FlowControlArgs() {
   var master:ActorRef = null
   var manager:ActorRef = null
   
@@ -28,6 +28,11 @@ abstract class FlowControlArgs() {
     flowConfig = conf
   }
   
+  def workerArgs(): FlowControlArgs = {
+  	val newArgs = new FlowControlArgs()
+  	newArgs.addMaster(master)
+  	return newArgs
+  }    
 }
 
 case class FlowControlConfig(name:String, actorType:String, parallel:Int=1, role:String="kc-frontend")
@@ -52,10 +57,13 @@ class FlowControlMaster(config:FlowControlConfig, args:FlowControlArgs) extends 
 	  allowLocalRoutees = true, useRole = Some(config.role)))))
 }
 
-class FlowControlWorker(config:FlowControlConfig, args:FlowControlArgs) extends Worker(args.master) {
+class FlowControlWorker(config:FlowControlConfig, masterArgs:FlowControlArgs) extends Worker(masterArgs.master) {
   implicit val ec = context.dispatcher
  
   log.info("{} Worker staring", config.name)
+  
+  // Get worker args
+  val args = masterArgs.workerArgs()
   
   args.addManager(self)
   args.addFlowConfig(config)
