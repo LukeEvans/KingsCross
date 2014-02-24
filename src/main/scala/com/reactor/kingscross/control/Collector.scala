@@ -10,7 +10,14 @@ import com.reactor.base.patterns.pull._
 import akka.actor.ActorRef
 import com.reactor.kingscross.config.Config
 
-case class CollectorArgs(config:NewsConfig) extends FlowControlArgs
+case class CollectorArgs(config:NewsConfig) extends FlowControlArgs {
+  override def workerArgs(): CollectorArgs = {
+  	val newArgs = new CollectorArgs(config)
+  	newArgs.addMaster(master)
+  	return newArgs
+  }  	
+}
+
 case object InitRequest
 
 abstract class Collector(args:CollectorArgs) extends FlowControlActor(args) {
