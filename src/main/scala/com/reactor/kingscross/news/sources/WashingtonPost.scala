@@ -14,21 +14,20 @@ import com.reactor.kingscross.news.TopicSet
 import akka.actor.Props
 
 //================================================================================
-// 	Pro Football Talk
+// 	Washington Post
 //  Notes: - abstract with Difbot
 //================================================================================
 
-class ProFootballTalkNews(config:NewsConfig)  extends News(config:NewsConfig) {
+class WashingtonPostNews(config:NewsConfig)  extends News(config:NewsConfig) {
   //Emitter
   val emitter = context.actorOf(Props(classOf[NewsEmitter], config))
   // Collector
-	val flowConfig = FlowControlConfig(name="proFootballTalkCollector", actorType="com.reactor.kingscross.news.sources.ProFootballTalkNewsCollector")
+	val flowConfig = FlowControlConfig(name="washingtonPostCollector", actorType="com.reactor.kingscross.news.sources.WashingtonPostNewsCollector")
 	val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
-
 }
 
 
-class ProFootballTalkNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
+class WashingtonPostNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
 
   val allowFirstPersonSpeech:Boolean = false
   val isDevChannel:Boolean = false

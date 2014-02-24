@@ -14,21 +14,21 @@ import com.reactor.kingscross.news.TopicSet
 import akka.actor.Props
 
 //================================================================================
-// 	Pro Football Talk
+// 	TechCrunch
 //  Notes: - abstract with Difbot
 //================================================================================
 
-class ProFootballTalkNews(config:NewsConfig)  extends News(config:NewsConfig) {
+class TechCrunchNews(config:NewsConfig)  extends News(config:NewsConfig) {
   //Emitter
   val emitter = context.actorOf(Props(classOf[NewsEmitter], config))
   // Collector
-	val flowConfig = FlowControlConfig(name="proFootballTalkCollector", actorType="com.reactor.kingscross.news.sources.ProFootballTalkNewsCollector")
+	val flowConfig = FlowControlConfig(name="techCrunchCollector", actorType="com.reactor.kingscross.news.sources.TechCrunchNewsCollector")
 	val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
 
 }
 
 
-class ProFootballTalkNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
+class TechCrunchNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
 
   val allowFirstPersonSpeech:Boolean = false
   val isDevChannel:Boolean = false
@@ -87,7 +87,6 @@ class ProFootballTalkNewsCollector(args:CollectorArgs) extends NewsCollector(arg
         }
     }
   }
-
   //	Filter out bad source-specific entities
   def removeBadEntities(dirtyEnt:Set[Entity]):Set[Entity] = {
     dirtyEnt

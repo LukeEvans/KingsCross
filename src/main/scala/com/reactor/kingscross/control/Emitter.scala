@@ -25,7 +25,7 @@ abstract class Emitter(config:PollingConfig) extends Actor with ActorLogging {
     // Tick Timer
   	implicit val ec = context.dispatcher
 	val cancellable =
-		context.system.scheduler.schedule(config.start_delay seconds,
+		context.system.scheduler.schedule(config.start_delay minutes,
 		config.poll_time seconds,
 		self,
 		FetchEvent)

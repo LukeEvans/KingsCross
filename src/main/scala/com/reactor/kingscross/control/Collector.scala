@@ -10,14 +10,20 @@ import com.reactor.base.patterns.pull._
 import akka.actor.ActorRef
 import com.reactor.kingscross.config.Config
 
-case class CollectorArgs(config:Config) extends FlowControlArgs
+case class CollectorArgs(config:NewsConfig) extends FlowControlArgs
+case object InitRequest
 
 abstract class Collector(args:CollectorArgs) extends FlowControlActor(args) {
 
   // Save config
   val config = args.config
   val master = args.master
-  
+
+
+  self ! InitRequest
+
+  def init()
+
   // Required to be implemented
   def handleEvent(event: EmitEvent): Unit
   
@@ -37,6 +43,7 @@ abstract class Collector(args:CollectorArgs) extends FlowControlActor(args) {
   }
   
   def receive = {
-    case event:EmitEvent => handleEvent(event) 
+    case event:EmitEvent => handleEvent(event)
+    case InitRequest => init()
   }
 }

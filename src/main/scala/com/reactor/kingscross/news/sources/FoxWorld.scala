@@ -1,37 +1,34 @@
 package com.reactor.kingscross.news.sources
 
-import com.reactor.kingscross.control.{CollectorArgs, EmitEvent}
+
 import com.reactor.kingscross.config.NewsConfig
-import com.reactor.base.patterns.pull.FlowControlConfig
 import com.reactor.base.patterns.pull.FlowControlFactory
-import com.reactor.kingscross.news.Abstraction
-import com.reactor.kingscross.news.Entity
-import com.reactor.kingscross.news.News
-import com.reactor.kingscross.news.NewsEmitter
-import com.reactor.kingscross.news.NewsCollector
-import com.reactor.kingscross.news.NewsStory
-import com.reactor.kingscross.news.TopicSet
+import com.reactor.kingscross.news._
 import akka.actor.Props
+import com.reactor.kingscross.control.CollectorArgs
+import com.reactor.kingscross.control.EmitEvent
+import com.reactor.base.patterns.pull.FlowControlConfig
+import scala.Some
 
 //================================================================================
-// 	Pro Football Talk
-//  Notes: - abstract with Difbot
+// 	Fox World
+//  Notes: uses difbot for extraction and Wikipedia image solution for images
 //================================================================================
 
-class ProFootballTalkNews(config:NewsConfig)  extends News(config:NewsConfig) {
+class FoxWorldNews(config:NewsConfig)  extends News(config:NewsConfig) {
   //Emitter
   val emitter = context.actorOf(Props(classOf[NewsEmitter], config))
   // Collector
-	val flowConfig = FlowControlConfig(name="proFootballTalkCollector", actorType="com.reactor.kingscross.news.sources.ProFootballTalkNewsCollector")
+	val flowConfig = FlowControlConfig(name="foxWorldCollector", actorType="com.reactor.kingscross.news.sources.FoxWorldNewsCollector")
 	val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
 
 }
 
 
-class ProFootballTalkNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
+class FoxWorldNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
 
   val allowFirstPersonSpeech:Boolean = false
-  val isDevChannel:Boolean = false
+  var isDevChannel:Boolean = false
 
   override def handleEvent(event:EmitEvent) {
 
@@ -42,6 +39,7 @@ class ProFootballTalkNewsCollector(args:CollectorArgs) extends NewsCollector(arg
         complete()
         return
       case Some(story:NewsStory) =>
+
         //	Build article abstraction - this gets entire text and image URLs
         abstractWithDifbot(story.link)  match {
           case None =>
@@ -50,14 +48,19 @@ class ProFootballTalkNewsCollector(args:CollectorArgs) extends NewsCollector(arg
             return
           case Some(difbotAbstraction:Abstraction) =>
             //	Handle Images (custom to each news source)
-            if (difbotAbstraction.primary_images.size > 0) {
-              story.image_links = difbotAbstraction.primary_images
-            }
-            else {
-              story.image_links = difbotAbstraction.secondary_images
-            }
 
-            //println(story.image_links.size + " images links added to story\n")
+            //  Use Wiki Image Source for image extraction
+            val wikiImages:WikiImageService = new WikiImageService()
+            wikiImages.getTopNImagesFromAbstract(difbotAbstraction.text,2) match {
+              case Some(images:Set[String]) => story.image_links = images
+              case None =>
+                if (difbotAbstraction.primary_images.size > 0) {
+                  story.image_links = difbotAbstraction.primary_images
+                }
+                else {
+                  story.image_links = difbotAbstraction.secondary_images
+                }
+            }
 
             story.parseAbstraction(difbotAbstraction)
             story.speech = story.buildSpeech()
@@ -70,7 +73,7 @@ class ProFootballTalkNewsCollector(args:CollectorArgs) extends NewsCollector(arg
               case Some(newSpeech:String) => newSpeech
               case None => story.speech
             }
-            story.full_text = scrubFullText(story.full_text)
+            story.full_text = scrubFullText(story.full_text)  // TODO should we be scrubbing the summary too?
             story.entities = removeBadEntities(story.entities)
 
             //	Topic Extraction

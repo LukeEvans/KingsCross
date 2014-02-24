@@ -78,6 +78,6 @@ abstract class FlowControlActor(args:FlowControlArgs) extends Actor with ActorLo
 	
     // Complete work
 	def complete() {
-	  args.manager ! WorkComplete
+	  args.manager ! WorkComplete()
 	}
 }

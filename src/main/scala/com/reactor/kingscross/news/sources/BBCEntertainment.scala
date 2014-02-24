@@ -14,21 +14,21 @@ import com.reactor.kingscross.news.TopicSet
 import akka.actor.Props
 
 //================================================================================
-// 	Pro Football Talk
+// 	BBC Entertainment
 //  Notes: - abstract with Difbot
 //================================================================================
 
-class ProFootballTalkNews(config:NewsConfig)  extends News(config:NewsConfig) {
+class BBCEntertainmentNews(config:NewsConfig)  extends News(config:NewsConfig) {
   //Emitter
   val emitter = context.actorOf(Props(classOf[NewsEmitter], config))
   // Collector
-	val flowConfig = FlowControlConfig(name="proFootballTalkCollector", actorType="com.reactor.kingscross.news.sources.ProFootballTalkNewsCollector")
+	val flowConfig = FlowControlConfig(name="bbcEntertainmentCollector", actorType="com.reactor.kingscross.news.sources.BBCEntertainmentNewsCollector")
 	val collector = FlowControlFactory.flowControlledActorFor(context, flowConfig, CollectorArgs(config=config))
 
 }
 
 
-class ProFootballTalkNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
+class BBCEntertainmentNewsCollector(args:CollectorArgs) extends NewsCollector(args:CollectorArgs) {
 
   val allowFirstPersonSpeech:Boolean = false
   val isDevChannel:Boolean = false
@@ -42,6 +42,7 @@ class ProFootballTalkNewsCollector(args:CollectorArgs) extends NewsCollector(arg
         complete()
         return
       case Some(story:NewsStory) =>
+
         //	Build article abstraction - this gets entire text and image URLs
         abstractWithDifbot(story.link)  match {
           case None =>

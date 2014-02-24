@@ -1,6 +1,6 @@
 package com.reactor.kingscross.twitter
 
-import com.reactor.kingscross.config.PollingConfig
+import com.reactor.kingscross.config.{NewsConfig, PollingConfig}
 import com.reactor.base.patterns.pull.FlowControlConfig
 import com.reactor.base.patterns.pull.FlowControlFactory
 import akka.actor.Actor
@@ -12,7 +12,7 @@ import com.reactor.kingscross.store.ElasticsearchStore
 import com.reactor.kingscross.store.MongoStore
 import com.reactor.kingscross.store.TitanStore
 
-class Twitter(config:PollingConfig) extends Actor {
+class Twitter(config:NewsConfig) extends Actor {
 
   // Emitter
   val emmitter = context.actorOf(Props(classOf[TwitterEmitter], config))
@@ -36,6 +36,10 @@ class TwitterEmitter(config:PollingConfig) extends Emitter(config) {
 }
 
 class TwitterCollector(args:CollectorArgs) extends Collector(args) {
+
+  def init() {
+
+  }
 
     def handleEvent(event:EmitEvent) {
     

@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.mongodb.casbah.{MongoCollection, MongoURI}
 import com.mongodb.casbah.commons.MongoDBObject
 import com.mongodb.DBObject
+import com.fasterxml.jackson.databind.node.ArrayNode
 
 
 class NewsChannel {
@@ -52,6 +53,7 @@ class News(config: NewsConfig) extends Actor {
 // Fetch news from RSS
 class NewsEmitter(config: NewsConfig) extends Emitter(config) {
 
+  println("\n\nStarting emitter for " + config.source_id + "\n\n")
 
   def handleEvent() {
     println("News emitter handle event for " + config.source_id + " from url " + config.source_url)
@@ -82,7 +84,7 @@ class NewsEmitter(config: NewsConfig) extends Emitter(config) {
           entryMap += ("entry_url" -> entry.asInstanceOf[SyndEntry].getLink)
           entryMap += ("entry_author" -> entry.asInstanceOf[SyndEntry].getAuthor)
 
-          //	Extract any categories associated with the RSS
+
           var categories: Set[String] = Set()
           for (category <- entry.asInstanceOf[SyndEntry].getCategories.asScala) {
             categories += category.asInstanceOf[SyndCategory].getName
@@ -131,18 +133,105 @@ class NewsEmitter(config: NewsConfig) extends Emitter(config) {
 // Collect News
 class NewsCollector(args: CollectorArgs) extends Collector(args) {
 
+  val abstractor = new Abstractor()
+  val jsoupAbstractor = new JsoupAbstractor()
+  val summarizor = new Summarizor()
+  val scrubber = new Scrubber()
+  val topicExtractor = new TopicExtractor()
+  val mapper = new ObjectMapper()
+
+
+  //  Mongo Variables
   val uri = MongoURI("mongodb://levans002:dakota1@ds031887.mongolab.com:31887/winston-db")
   val winstonDB = uri.connectDB
+
+  //  Source Data
+  var id:String = args.config.source_id
+  var iconLink:String = ""
+  var ceilingTopic:String = ""
+  var name:String = ""
+  var category:String = ""
+  var twitterHandle:String = ""
+
+  var devChannel = false
+
+  def init() {
+    //  Load in the source data from Mongo
+
+    val channelCollection:MongoCollection = new MongoCollection(winstonDB.right.get.getCollection("reactor-news-sources"))
+    val query = MongoDBObject("source_id" -> id)
+    channelCollection.findOne(query) match {
+      case Some(x:DBObject) => parseChannelData(new MongoDBObject(x))
+      case None =>
+        //  Check in Dev collection
+        val channelCollection:MongoCollection = new MongoCollection(winstonDB.right.get.getCollection("reactor-news-sources-dev"))
+        val query = MongoDBObject("source_id" -> id)
+        channelCollection.findOne(query) match {
+          case Some(x:DBObject) =>
+            devChannel = true
+            parseChannelData(new MongoDBObject(x))
+          case None =>
+            println("\nERROR: No channel entry found for " + id)
+        }
+    }
+  }
+
+  def parseChannelData(channelData:MongoDBObject) {
+
+    channelData.getAs[String]("icon") match {
+      case Some(link:String) => iconLink = link
+      case None =>
+        println("\nWARNING: No source link found for " + id)
+    }
+
+    channelData.getAs[String]("name") match {
+      case Some(n:String) => name = n
+      case None =>
+        println("\nWARNING: No source name found for " + id)
+    }
+
+    channelData.getAs[String]("category") match {
+      case Some(s:String) => category = s
+      case None => println("WARNING: Category field missing for " + id)
+    }
+
+    channelData.getAs[String]("twitter_handle") match {
+      case Some(s:String) => twitterHandle = s
+      case None => println("WARNING: twitter handle field missing for " + id)
+    }
+
+    channelData.getAs[String]("ceiling_topic") match {
+      case Some(n:String) => ceilingTopic = n
+      case None =>
+        println("\nWARNING: No ceiling topic found for " + id)
+    }
+  }
 
   def handleEvent(event: EmitEvent) {
     //	Each news source overrides this method  
   }
 
-  def parseEventData(data: JsonNode): NewsStory = {
+  def addChannelInfo(story:NewsStory):NewsStory = {
+    //  Add channel variables
+    story.source_id = id
+    story.source_category = category
+    story.source_twitter_handle = twitterHandle
+    story.ceiling_topic = ceilingTopic
+    story.source_name = name
+    story.source_icon_link = iconLink
+    story
+  }
+
+  def parseEventData(data: JsonNode):Option[NewsStory] = {
 
     // Take event.data JsonNode built by Emitter and build a NewsStory object
-    val story = new NewsStory()
+    var story = new NewsStory()
     story.story_type = "News"
+
+    story = addChannelInfo(story)
+
+
+    //  Add emitter variables
     val title: String = data.get("entry_title").asText()
     story.headline = StringEscapeUtils.unescapeHtml(title)
     story.pubdate = data.get("entry_pubdate").asText()
@@ -150,11 +239,58 @@ class NewsCollector(args: CollectorArgs) extends Collector(args) {
     story.link = data.get("entry_url").asText()
     story.author = data.get("entry_author").asText()
 
-    story
+
+    //	Add Categories as entities
+    val categoryJson:String = data.path("categories").asText()
+    if (!categoryJson.equals("")) {
+      val categories:JsonNode = mapper.readTree(categoryJson)
+      if (categories!= null && !categories.isMissingNode) {
+        for( a <- 0 until categories.size()) {
+          val category:String = categories.get(a).asText()
+          val entity = new Entity(category)
+          story.entities += entity
+        }
+      }
+    }
+
+    if (checkInitialValidity(story)) {
+      Some(story)
+    }
+    else
+    {
+      None
+    }
+  }
+
+  def checkInitialValidity(story:NewsStory):Boolean = {
+
+    if (story.ceiling_topic.equals("")) {
+      false
+    }
+
+    if (story.source_name.equals("")) {
+      false
+    }
+
+    if (story.source_icon_link.equals("")) {
+      false
+    }
+
+    if (story.headline.equals("")) {
+      false
+    }
+
+    if (story.pubdate.equals("")) {
+      false
+    }
+
+    if (story.link.equals("")) {
+      false
+    }
+    true
   }
 
   def abstractWithDifbot(url: String): Option[Abstraction] = {
-    val abstractor = new Abstractor() // TODO: make one object with collector
     abstractor.getDifbotAbstraction(url) match {
       case Some(a: Abstraction) => Some(a)
       case None => None
@@ -162,8 +298,11 @@ class NewsCollector(args: CollectorArgs) extends Collector(args) {
   }
 
   def abstractWithGoose(url: String):Option[Abstraction] = {
-    val abstractor = new Abstractor()
     abstractor.getGooseAbstraction(url)
+  }
+
+  def getTextFromJsoup(url:String, rules:ExtractionRules):Option[String] = {
+    jsoupAbstractor.getText(url,rules)
   }
 
   def getSummary(headline: String, fullText: String): String = {
@@ -173,7 +312,6 @@ class NewsCollector(args: CollectorArgs) extends Collector(args) {
       return null
     }
 
-    val summarizor = new Summarizor()
     summarizor.getSummary(headline, fullText) match {
       case Some(summary: String) => summary
       case None => null
@@ -181,24 +319,21 @@ class NewsCollector(args: CollectorArgs) extends Collector(args) {
   }
 
   def scrubSpeech(speech: String): Option[String] = {
-    val scrubber: Scrubber = new Scrubber()
     scrubber.scrubSpeechEvent(speech)
   }
 
   def scrubFullText(text: String): String = {
-    val scrubber: Scrubber = new Scrubber()
     scrubber.scrubFullText(text)
   }
 
   def getTopics(story: NewsStory): TopicSet = {
-    val topicExtractor = new TopicExtractor()
     topicExtractor.extractTopicsFromStory(story)
   }
 
-  def publishStory(story: NewsStory, isDev: Boolean) {
+  def publishStory(story: NewsStory, forceDev: Boolean) {
     // Publish the news story object as json
 
-    if (isDev) {
+    if (forceDev || devChannel) {
       write_platform = "store-/news/dev"
     }
 
