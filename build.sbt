@@ -28,8 +28,6 @@ libraryDependencies += "com.typesafe.akka" % "akka-contrib_2.10" % "2.2.3"
 
 libraryDependencies += "com.typesafe" % "config" % "1.0.2"
 
-libraryDependencies += "edu.stanford.nlp" % "stanford-corenlp" % "3.2.0" artifacts (Artifact("stanford-corenlp", "models"), Artifact("stanford-corenlp")) 
-
 libraryDependencies += "com.fasterxml.jackson.core" % "jackson-databind" % "2.2.3"
 
 libraryDependencies += "com.fasterxml.jackson.core" % "jackson-core" % "2.2.3"
@@ -51,8 +49,6 @@ libraryDependencies += "org.json4s" %% "json4s-jackson" % "3.2.5"
 libraryDependencies += "play" % "play_2.10" % "2.1.0"
 
 libraryDependencies += "org.elasticsearch" % "elasticsearch" % "0.90.0"
-
-libraryDependencies += "org.apache.opennlp" % "opennlp-tools" % "1.5.3"
 
 libraryDependencies += "com.indeed" % "java-dogstatsd-client" % "2.0.7"
 
